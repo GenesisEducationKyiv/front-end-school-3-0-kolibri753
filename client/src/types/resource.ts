@@ -1,7 +1,10 @@
+import type { AppError } from "@/api/errors";
+
 export interface ResourceState<T> {
   list: T[];
   loading: boolean;
-  error: boolean;
+  // null = OK, otherwise carries the reason
+  error: AppError | null;
 }
 
 export interface RefreshableResourceState<T> extends ResourceState<T> {
