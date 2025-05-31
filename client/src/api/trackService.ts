@@ -1,16 +1,7 @@
 import { BaseService } from "./baseService";
 import { IHttpClient } from "./httpClient";
-import { Track, TrackFormData, Paginated } from "@/types";
-
-export interface FetchTracksOptions {
-  page?: number;
-  limit?: number;
-  sort?: keyof Track;
-  order?: "asc" | "desc";
-  genre?: string;
-  artist?: string;
-  search?: string;
-}
+import type { Track, Paginated, FetchTracksOptions } from "@/types";
+import type { TrackFormData } from "@/schemas";
 
 export class TrackService extends BaseService<Track, TrackFormData> {
   protected static readonly resource = "tracks";
