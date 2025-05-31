@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { artistService } from "@/api";
-import type { RefreshableResourceState } from "@/types";
+import type { RefreshableResourceState } from "@/types/resource";
 
 /**
  * Get the list of artist names
@@ -16,9 +16,8 @@ export function useArtists(): RefreshableResourceState<string> {
       setError(false);
       const data = await artistService.list({ signal });
       setList(data);
-    } catch (err: any) {
-      if (err.name !== "AbortError") {
-        console.error(err);
+    } catch (err: unknown) {
+      if (!(err instanceof DOMException && err.name === "AbortError")) {
         setError(true);
       }
     } finally {
