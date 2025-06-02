@@ -1,4 +1,4 @@
-# ADR-0001 – Prevent AudioPlayer Blink via Stable Row IDs & Direct Track Passing
+# ADR-0001 – [Usability] Prevent AudioPlayer Blink via Stable Row IDs & Direct Track Passing
 
 ## Context/Forces
 

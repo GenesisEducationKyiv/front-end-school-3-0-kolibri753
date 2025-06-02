@@ -1,4 +1,4 @@
-# ADR-0002 – Modularize TrackForm via RHF & Zod
+# ADR-0002 – [Maintainability] Modularize TrackForm via RHF & Zod
 
 ## Context/Forces
 
@@ -23,6 +23,7 @@ We will introduce a dedicated **Form Layer** and supporting types:
 1. **Dependencies**
 
    _Install:_
+
    ```bash
    npm install react-hook-form @hookform/resolvers zod
    ```
