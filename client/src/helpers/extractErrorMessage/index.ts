@@ -1,34 +1,21 @@
-import type { AppError } from "@/api/errors";
+import { isAppError } from "./isAppError";
+import { isRecord } from "./isRecord";
 
 /**
  * Pulls a human-readable message
  */
 export function extractErrorMessage(err: unknown): string {
-  if (
-    typeof err === "object" &&
-    err !== null &&
-    "type" in err &&
-    "message" in err
-  ) {
-    const e = err as AppError;
-    if (e.type === "Validation") {
-      const parts = Object.values(e.fieldErrors);
-      if (parts.length > 0) return parts.join(", ");
+  if (isAppError(err)) {
+    if (err.type === "Validation") {
+      const parts = Object.values(err.fieldErrors).filter(Boolean);
+      return parts.length ? parts.join(", ") : err.message;
     }
-    return e.message;
+    return err.message;
   }
 
-  if (err instanceof Error) {
-    return err.message || "Unexpected error";
-  }
+  if (err instanceof Error && err.message) return err.message;
 
-  if (
-    typeof err === "object" &&
-    err !== null &&
-    typeof (err as { message?: unknown }).message === "string"
-  ) {
-    return (err as { message: string }).message;
-  }
+  if (isRecord(err) && typeof err.message === "string") return err.message;
 
   return "Something went wrong";
 }
