@@ -1,32 +1,39 @@
 import { useEffect, useState } from "react";
 import { genreService } from "@/api";
+import type { ResourceState } from "@/types";
+import type { AppError } from "@/api/errors";
 
 /**
  * Get the list of genre names
  */
-export function useGenres() {
-  const [genres, setGenres] = useState<string[]>([]);
+export function useGenres(): ResourceState<string> {
+  const [list, setList] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<Error | null>(null);
+  const [error, setError] = useState<AppError | null>(null);
 
   useEffect(() => {
     const ctrl = new AbortController();
+    setLoading(true);
 
     genreService
       .list({ signal: ctrl.signal })
-      .then((data) => {
-        setGenres(data);
+      .then((res) =>
+        res.match(
+          (data) => {
+            setList(data);
+            setError(null);
+          },
+          (e) => {
+            setError(e);
+          }
+        )
+      )
+      .finally(() => {
         setLoading(false);
-      })
-      .catch((err) => {
-        if (err.name !== "AbortError") {
-          setError(err);
-          setLoading(false);
-        }
       });
 
     return () => ctrl.abort();
   }, []);
 
-  return { genres, loading, error };
+  return { list, loading, error };
 }

@@ -10,11 +10,19 @@ export interface Track {
   audioFile?: string;
 }
 
-export type TrackFormData = Omit<Track, "id" | "slug" | "createdAt">;
-
 export interface Meta {
   total: number;
   page: number;
   limit: number;
   totalPages: number;
+}
+
+export interface FetchTracksOptions {
+  page?: number;
+  limit?: number;
+  sort?: keyof Track;
+  order?: "asc" | "desc";
+  genre?: string;
+  artist?: string;
+  search?: string;
 }

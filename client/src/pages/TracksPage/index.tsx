@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useTracks, useArtists, useGenres } from "@/hooks";
 import {
   DeleteConfirmationModal,
@@ -8,7 +8,8 @@ import {
   UploadFileModal,
   TrackToolbar,
 } from "@/components";
-import type { Track, TrackFormData } from "@/types";
+import type { Track } from "@/types";
+import type { TrackFormData } from "@/schemas";
 import { trackService } from "@/api";
 import { extractErrorMessage, showToastMessage } from "@/helpers";
 
@@ -38,18 +39,8 @@ const TracksPage: React.FC = () => {
     if (page > totalPages) setPage(totalPages || 1);
   }, [page, totalPages, setPage]);
 
-  const {
-    genres: genreList,
-    loading: genresLoading,
-    error: genresError,
-  } = useGenres();
-
-  const {
-    artists: artistList,
-    loading: artistsLoading,
-    error: artistsError,
-    refetch: refetchArtists,
-  } = useArtists();
+  const genres = useGenres();
+  const artists = useArtists();
 
   const [isCreating, setIsCreating] = useState(false);
   const [editingTrack, setEditingTrack] = useState<Track | null>(null);
@@ -59,15 +50,17 @@ const TracksPage: React.FC = () => {
   const [bulkDeleteIds, setBulkDeleteIds] = useState<string[]>([]);
 
   const handleCreate = async (form: TrackFormData) => {
-    try {
-      await trackService.create(form);
-      showToastMessage("success", "Track created successfully");
-      await Promise.all([refetchTracks(), refetchArtists()]);
-    } catch (e) {
-      showToastMessage("error", extractErrorMessage(e));
-    } finally {
-      setIsCreating(false);
-    }
+    const res = await trackService.create(form);
+
+    res.match(
+      async () => {
+        showToastMessage("success", "Track created successfully");
+        await Promise.all([refetchTracks(), artists.refetch()]);
+      },
+      (e) => showToastMessage("error", extractErrorMessage(e))
+    );
+
+    setIsCreating(false);
   };
 
   const handleUpdate = async (form: TrackFormData) => {
@@ -85,97 +78,79 @@ const TracksPage: React.FC = () => {
       return;
     }
 
-    try {
-      await trackService.update(editingTrack.id, form);
-      showToastMessage("success", "Track updated successfully");
-      await Promise.all([refetchTracks(), refetchArtists()]);
-    } catch (e) {
-      showToastMessage("error", extractErrorMessage(e));
-    } finally {
-      setEditingTrack(null);
-    }
+    const res = await trackService.update(editingTrack.id, form);
+    res.match(
+      async () => {
+        showToastMessage("success", "Track updated successfully");
+        await Promise.all([refetchTracks(), artists.refetch()]);
+      },
+      (e) => showToastMessage("error", extractErrorMessage(e))
+    );
+    setEditingTrack(null);
   };
 
   const confirmDelete = async () => {
     if (!deletingTrack) return;
-    try {
-      await trackService.delete(deletingTrack.id);
-      showToastMessage("success", "Track deleted successfully");
-      await Promise.all([refetchTracks(), refetchArtists()]);
-    } catch (e) {
-      showToastMessage("error", extractErrorMessage(e));
-    } finally {
-      setDeletingTrack(null);
-    }
+
+    const res = await trackService.delete(deletingTrack.id);
+    res.match(
+      async () => {
+        showToastMessage("success", "Track deleted successfully");
+        await Promise.all([refetchTracks(), artists.refetch()]);
+      },
+      (e) => showToastMessage("error", extractErrorMessage(e))
+    );
+
+    setDeletingTrack(null);
   };
 
   const confirmUpload = async (file: File) => {
     if (!uploadingTrack) return;
-    try {
-      await trackService.uploadTrackFile(uploadingTrack.id, file);
-      showToastMessage("success", "File uploaded");
-      await refetchTracks();
-    } catch (e) {
-      showToastMessage("error", extractErrorMessage(e));
-    } finally {
-      setUploadingTrack(null);
-    }
+
+    const res = await trackService.uploadTrackFile(uploadingTrack.id, file);
+    res.match(
+      async () => {
+        showToastMessage("success", "File uploaded");
+        await refetchTracks();
+      },
+      (e) => showToastMessage("error", extractErrorMessage(e))
+    );
+
+    setUploadingTrack(null);
   };
 
   const confirmDeleteFile = async () => {
     if (!deletingFileTrack) return;
-    try {
-      await trackService.deleteTrackFile(deletingFileTrack.id);
-      showToastMessage("success", "File removed");
-      await Promise.all([refetchTracks(), refetchArtists()]);
-    } catch (e) {
-      showToastMessage("error", extractErrorMessage(e));
-    } finally {
-      setDeletingFile(null);
-    }
+
+    const res = await trackService.deleteTrackFile(deletingFileTrack.id);
+    res.match(
+      async () => {
+        showToastMessage("success", "File removed");
+        await Promise.all([refetchTracks(), artists.refetch()]);
+      },
+      (e) => showToastMessage("error", extractErrorMessage(e))
+    );
+
+    setDeletingFile(null);
   };
 
   const handleBulkDelete = async (ids: string[]) => {
-    try {
-      const { success, failed } = await trackService.deleteMultipleTracks(ids);
-      showToastMessage(
-        "success",
-        `Deleted ${success.length} track${success.length === 1 ? "" : "s"}`
-      );
-      if (failed.length)
-        showToastMessage("error", `Failed to delete: ${failed.join(", ")}`);
-      await Promise.all([refetchTracks(), refetchArtists()]);
-    } catch (e) {
-      showToastMessage("error", extractErrorMessage(e));
-    } finally {
-      setBulkDeleteIds([]);
-    }
+    const res = await trackService.deleteMultipleTracks(ids);
+    res.match(
+      async ({ success, failed }) => {
+        showToastMessage(
+          "success",
+          `Deleted ${success.length} track${success.length === 1 ? "" : "s"}`
+        );
+        if (failed.length)
+          showToastMessage("error", `Failed to delete: ${failed.join(", ")}`);
+        await Promise.all([refetchTracks(), artists.refetch()]);
+      },
+      (e) => showToastMessage("error", extractErrorMessage(e))
+    );
+
+    setBulkDeleteIds([]);
   };
-
-  const openEdit = useCallback(
-    (id: string) => setEditingTrack(data.find((t) => t.id === id) ?? null),
-    [data]
-  );
-
-  const openDelete = useCallback(
-    (id: string) => setDeletingTrack(data.find((t) => t.id === id) ?? null),
-    [data]
-  );
-
-  const openUpload = useCallback(
-    (id: string) => setUploadingTrack(data.find((t) => t.id === id) ?? null),
-    [data]
-  );
-
-  const openDeleteFile = useCallback(
-    (id: string) => setDeletingFile(data.find((t) => t.id === id) ?? null),
-    [data]
-  );
-
-  const triggerBulkDelete = useCallback(
-    (ids: string[]) => setBulkDeleteIds(ids),
-    []
-  );
 
   return (
     <div className="min-h-screen">
@@ -192,16 +167,8 @@ const TracksPage: React.FC = () => {
         </div>
 
         <TrackToolbar
-          artists={{
-            list: artistList,
-            loading: artistsLoading,
-            error: !!artistsError,
-          }}
-          genres={{
-            list: genreList,
-            loading: genresLoading,
-            error: !!genresError,
-          }}
+          artists={artists}
+          genres={genres}
           filterArtist={filterArtist}
           setFilterArtist={setFilterArtist}
           filterGenre={filterGenre}
@@ -221,17 +188,18 @@ const TracksPage: React.FC = () => {
           limit={limit}
           setPage={setPage}
           setLimit={setLimit}
-          onEdit={openEdit}
-          onDelete={openDelete}
-          onUploadClick={openUpload}
-          onDeleteFile={openDeleteFile}
-          onBulkDelete={triggerBulkDelete}
+          onEdit={setEditingTrack}
+          onDelete={setDeletingTrack}
+          onUploadClick={setUploadingTrack}
+          onDeleteFile={setDeletingFile}
+          onBulkDelete={setBulkDeleteIds}
         />
 
         {isCreating && (
           <Modal onClose={() => setIsCreating(false)}>
             <TrackForm
               onSubmit={handleCreate}
+              genres={genres}
               onCancel={() => setIsCreating(false)}
             />
           </Modal>
@@ -241,6 +209,7 @@ const TracksPage: React.FC = () => {
           <Modal onClose={() => setEditingTrack(null)}>
             <TrackForm
               initialData={editingTrack}
+              genres={genres}
               onSubmit={handleUpdate}
               onCancel={() => setEditingTrack(null)}
             />

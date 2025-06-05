@@ -1,9 +1,10 @@
 import React from "react";
 import { FilterSelect, SearchInput } from "@/components";
+import type { ResourceState } from "@/types";
 
 export interface TrackToolbarProps {
-  artists: { list: string[]; loading: boolean; error: boolean };
-  genres: { list: string[]; loading: boolean; error: boolean };
+  artists: ResourceState<string>;
+  genres: ResourceState<string>;
 
   filterArtist: string;
   setFilterArtist(v: string): void;
@@ -39,7 +40,7 @@ export const TrackToolbar: React.FC<TrackToolbarProps> = ({
         options={artists.list}
         value={filterArtist}
         loading={artists.loading}
-        error={artists.error}
+        error={!!artists.error}
         dataTestId="filter-artist"
         onChange={setFilterArtist}
       />
@@ -48,7 +49,7 @@ export const TrackToolbar: React.FC<TrackToolbarProps> = ({
         options={genres.list}
         value={filterGenre}
         loading={genres.loading}
-        error={genres.error}
+        error={!!genres.error}
         dataTestId="filter-genre"
         onChange={setFilterGenre}
       />

@@ -4,12 +4,13 @@ import {
   getCoreRowModel,
   getSortedRowModel,
   flexRender,
-  SortingState,
+  type SortingState,
+  type RowSelectionState,
 } from "@tanstack/react-table";
-import { Track } from "@/types";
+import type { Track } from "@/types";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { SelectModeToggle } from "@/components";
-import { getColumns, SelectionOptions } from "./columns";
+import { columns, type TableMeta } from "./columns";
 import { PaginationControls } from "./PaginationControls";
 
 export interface TrackTableProps {
@@ -23,10 +24,10 @@ export interface TrackTableProps {
   limit: number;
   setPage(p: number): void;
   setLimit(l: number): void;
-  onEdit(id: string): void;
-  onDelete(id: string): void;
-  onUploadClick(id: string): void;
-  onDeleteFile(id: string): void;
+  onEdit(track: Track): void;
+  onDelete(track: Track): void;
+  onUploadClick(track: Track): void;
+  onDeleteFile(track: Track): void;
   onBulkDelete(ids: string[]): void;
 }
 
@@ -48,7 +49,12 @@ export const TrackTable: React.FC<TrackTableProps> = ({
   onBulkDelete,
 }) => {
   const [selectionMode, setSelectionMode] = useState(false);
-  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
+  const selectedIds = useMemo(
+    () => Object.keys(rowSelection).filter((k) => rowSelection[k]),
+    [rowSelection]
+  );
+
   const [sorting, setSorting] = useState<SortingState>([
     { id: sort, desc: order === "desc" },
   ]);
@@ -61,42 +67,25 @@ export const TrackTable: React.FC<TrackTableProps> = ({
     }
   }, [sorting, setSort, setOrder]);
 
-  const toggleId = (id: string) =>
-    setSelectedIds((prev) =>
-      prev.has(id)
-        ? new Set([...prev].filter((x) => x !== id))
-        : new Set(prev).add(id)
-    );
-
-  const toggleAll = () => {
-    const allVisibleIds = data.map((t) => t.id);
-    setSelectedIds((prev) =>
-      allVisibleIds.every((id) => prev.has(id))
-        ? new Set()
-        : new Set(allVisibleIds)
-    );
-  };
-
-  const columns = useMemo(
-    () =>
-      getColumns(onEdit, onDelete, onUploadClick, onDeleteFile, {
-        selectionMode,
-        selectedIds,
-        onToggleAll: toggleAll,
-        onToggleId: toggleId,
-      } as SelectionOptions),
-    [onEdit, onDelete, onUploadClick, onDeleteFile, selectionMode, selectedIds]
-  );
-
-  const table = useReactTable({
+  const table = useReactTable<Track>({
     data,
     columns,
-    state: { sorting },
+    getRowId: (row) => row.id,
+    state: { sorting, rowSelection },
     onSortingChange: setSorting,
+    onRowSelectionChange: setRowSelection,
+    enableRowSelection: true,
     manualSorting: sorting[0]?.id !== "genres",
     enableSortingRemoval: false,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
+    meta: {
+      selectionMode,
+      onEdit,
+      onDelete,
+      onUploadClick,
+      onDeleteFile,
+    } satisfies TableMeta,
   });
 
   return (
@@ -105,14 +94,14 @@ export const TrackTable: React.FC<TrackTableProps> = ({
         selectionMode={selectionMode}
         onToggleMode={() => {
           setSelectionMode((m) => !m);
-          if (selectionMode) setSelectedIds(new Set());
+          if (selectionMode) setRowSelection({});
         }}
-        selectedCount={selectedIds.size}
+        selectedCount={selectedIds.length}
         onBulkDelete={() => {
-          onBulkDelete(Array.from(selectedIds));
-          setSelectedIds(new Set());
+          onBulkDelete(selectedIds);
+          setRowSelection({});
         }}
-        bulkDeleteDisabled={selectedIds.size === 0}
+        bulkDeleteDisabled={selectedIds.length === 0}
       />
 
       <div className="overflow-x-auto">
@@ -127,14 +116,18 @@ export const TrackTable: React.FC<TrackTableProps> = ({
                     className="cursor-pointer select-none"
                     style={{ width: header.column.columnDef.size }}
                   >
-                    {flexRender(
-                      header.column.columnDef.header,
-                      header.getContext()
+                    {header.isPlaceholder ? null : (
+                      <>
+                        {flexRender(
+                          header.column.columnDef.header,
+                          header.getContext()
+                        )}
+                        {{
+                          asc: <ChevronUp className="inline w-4 h-4 ml-1" />,
+                          desc: <ChevronDown className="inline w-4 h-4 ml-1" />,
+                        }[header.column.getIsSorted() as string] ?? null}
+                      </>
                     )}
-                    {{
-                      asc: <ChevronUp className="inline w-4 h-4 ml-1" />,
-                      desc: <ChevronDown className="inline w-4 h-4 ml-1" />,
-                    }[header.column.getIsSorted() as string] ?? null}
                   </th>
                 ))}
               </tr>
