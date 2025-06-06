@@ -2,13 +2,14 @@ import { useState, useEffect, useCallback } from "react";
 import { trackService } from "@/api";
 import type { Track, Meta } from "@/types";
 import type { AppError } from "@/api/errors";
-import { useTrackQuery } from "@/lib/useTrackQuery";
+import { useTrackQuery } from "@/lib";
 
 /**
  * Fetch paginated tracks, params come from URL
  */
 export function useTracks() {
-  const { page, limit, sort, order, genre, artist, search } = useTrackQuery();
+  const { query, patch } = useTrackQuery();
+  const { page, limit } = query;
 
   const [data, setData] = useState<Track[]>([]);
   const [meta, setMeta] = useState<Meta>({
@@ -23,10 +24,7 @@ export function useTracks() {
   const fetchData = useCallback(
     async (signal?: AbortSignal) => {
       setLoading(true);
-      const res = await trackService.fetchTracks(
-        { page, limit, sort, order, genre, artist, search },
-        signal
-      );
+      const res = await trackService.fetchTracks(query, signal);
 
       res.match(
         ({ data: list, meta: m }) => {
@@ -36,10 +34,9 @@ export function useTracks() {
         },
         (e) => setError(e)
       );
-
       setLoading(false);
     },
-    [page, limit, sort, order, genre, artist, search]
+    [query]
   );
 
   useEffect(() => {
@@ -48,5 +45,5 @@ export function useTracks() {
     return () => ctrl.abort();
   }, [fetchData]);
 
-  return { data, meta, loading, error, refetch: fetchData };
+  return { data, meta, loading, error, refetch: fetchData, patch };
 }

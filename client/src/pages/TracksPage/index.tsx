@@ -19,7 +19,9 @@ const TracksPage: React.FC = () => {
     data,
     meta: { totalPages },
     refetch: refetchTracks,
+    patch,
   } = useTracks();
+  const { query } = useTrackQuery();
   const {
     page,
     limit,
@@ -28,8 +30,7 @@ const TracksPage: React.FC = () => {
     genre: filterGenre,
     artist: filterArtist,
     search,
-    patch,
-  } = useTrackQuery();
+  } = query;
 
   const memoData = useMemo(() => data, [data]);
 
@@ -169,11 +170,11 @@ const TracksPage: React.FC = () => {
         <TrackToolbar
           artists={artists}
           genres={genres}
-          filterArtist={filterArtist}
+          filterArtist={filterArtist ?? ""}
           setFilterArtist={(v) => patch({ artist: v, page: 1 })}
-          filterGenre={filterGenre}
+          filterGenre={filterGenre ?? ""}
           setFilterGenre={(v) => patch({ genre: v, page: 1 })}
-          search={search}
+          search={search ?? ""}
           setSearch={(v) => patch({ search: v, page: 1 })}
         />
 
