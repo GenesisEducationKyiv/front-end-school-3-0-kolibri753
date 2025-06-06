@@ -12,32 +12,32 @@ import type { Track } from "@/types";
 import type { TrackFormData } from "@/schemas";
 import { trackService } from "@/api";
 import { extractErrorMessage, showToastMessage } from "@/helpers";
+import { useTrackQuery } from "@/lib";
 
 const TracksPage: React.FC = () => {
   const {
     data,
     meta: { totalPages },
-    page,
-    limit,
-    setPage,
-    setLimit,
-    sort,
-    order,
-    setSort,
-    setOrder,
-    genre: filterGenre,
-    setGenre: setFilterGenre,
-    artist: filterArtist,
-    setArtist: setFilterArtist,
-    search,
-    setSearch,
     refetch: refetchTracks,
   } = useTracks();
+  const {
+    page,
+    limit,
+    sort,
+    order,
+    genre: filterGenre,
+    artist: filterArtist,
+    search,
+    patch,
+  } = useTrackQuery();
+
   const memoData = useMemo(() => data, [data]);
 
   useEffect(() => {
-    if (page > totalPages) setPage(totalPages || 1);
-  }, [page, totalPages, setPage]);
+    if (page > totalPages && totalPages >= 1) {
+      patch({ page: totalPages });
+    }
+  }, [page, totalPages, patch]);
 
   const genres = useGenres();
   const artists = useArtists();
@@ -170,24 +170,21 @@ const TracksPage: React.FC = () => {
           artists={artists}
           genres={genres}
           filterArtist={filterArtist}
-          setFilterArtist={setFilterArtist}
+          setFilterArtist={(v) => patch({ artist: v, page: 1 })}
           filterGenre={filterGenre}
-          setFilterGenre={setFilterGenre}
+          setFilterGenre={(v) => patch({ genre: v, page: 1 })}
           search={search}
-          setSearch={setSearch}
+          setSearch={(v) => patch({ search: v, page: 1 })}
         />
 
         <TrackTable
           data={memoData}
           sort={sort}
           order={order}
-          setSort={setSort}
-          setOrder={setOrder}
           page={page}
           totalPages={totalPages}
           limit={limit}
-          setPage={setPage}
-          setLimit={setLimit}
+          patch={patch}
           onEdit={setEditingTrack}
           onDelete={setDeletingTrack}
           onUploadClick={setUploadingTrack}

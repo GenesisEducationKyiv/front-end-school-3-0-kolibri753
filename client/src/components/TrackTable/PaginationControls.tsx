@@ -4,16 +4,14 @@ interface Props {
   page: number;
   totalPages: number;
   limit: number;
-  setPage: (p: number) => void;
-  setLimit: (l: number) => void;
+  patch(q: Record<string, string | number | undefined>): void;
 }
 
 export const PaginationControls: React.FC<Props> = ({
   page,
   totalPages,
   limit,
-  setPage,
-  setLimit,
+  patch,
 }) => (
   <div
     className="flex items-center justify-end flex-wrap gap-4 mt-4"
@@ -21,7 +19,7 @@ export const PaginationControls: React.FC<Props> = ({
   >
     <button
       className="btn btn-sm"
-      onClick={() => setPage(page - 1)}
+      onClick={() => patch({ page: page - 1 })}
       disabled={page <= 1}
       data-testid="pagination-prev"
     >
@@ -34,7 +32,7 @@ export const PaginationControls: React.FC<Props> = ({
 
     <button
       className="btn btn-sm"
-      onClick={() => setPage(page + 1)}
+      onClick={() => patch({ page: page + 1 })}
       disabled={page >= totalPages}
       data-testid="pagination-next"
     >
@@ -44,10 +42,7 @@ export const PaginationControls: React.FC<Props> = ({
     <select
       className="select select-bordered select-sm"
       value={limit}
-      onChange={(e) => {
-        setLimit(Number(e.target.value));
-        setPage(1);
-      }}
+      onChange={(e) => patch({ limit: Number(e.target.value), page: 1 })}
     >
       {[5, 10, 20].map((n) => (
         <option key={n} value={n}>

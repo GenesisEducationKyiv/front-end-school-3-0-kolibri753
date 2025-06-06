@@ -1,4 +1,9 @@
-import React, { useState, useEffect, type InputHTMLAttributes } from "react";
+import React, {
+  useState,
+  useEffect,
+  useRef,
+  type InputHTMLAttributes,
+} from "react";
 import { Search } from "lucide-react";
 
 type NativeInputProps = Omit<
@@ -28,10 +33,18 @@ export const SearchInput: React.FC<SearchInputProps> = ({
     setValue(initialValue);
   }, [initialValue]);
 
+  const didMountRef = useRef(false);
+
   useEffect(() => {
+    if (!didMountRef.current) {
+      didMountRef.current = true;
+      return;
+    }
+    if (value === initialValue) return;
+
     const handler = setTimeout(() => onChange(value), debounce);
     return () => clearTimeout(handler);
-  }, [value, debounce, onChange]);
+  }, [value, initialValue, debounce, onChange]);
 
   return (
     <fieldset className="fieldset w-full sm:w-auto">
