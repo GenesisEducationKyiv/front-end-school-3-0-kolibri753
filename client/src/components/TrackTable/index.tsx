@@ -1,0 +1,162 @@
+import React, { useEffect, useMemo, useState } from "react";
+import {
+  useReactTable,
+  getCoreRowModel,
+  getSortedRowModel,
+  flexRender,
+  type SortingState,
+  type RowSelectionState,
+} from "@tanstack/react-table";
+import type { Track } from "@/types";
+import { ChevronDown, ChevronUp } from "lucide-react";
+import { SelectModeToggle } from "@/components";
+import { columns, type TableMeta } from "./columns";
+import { PaginationControls } from "./PaginationControls";
+
+export interface TrackTableProps {
+  data: Track[];
+  sort: keyof Track;
+  order: "asc" | "desc";
+  setSort(v: keyof Track): void;
+  setOrder(v: "asc" | "desc"): void;
+  page: number;
+  totalPages: number;
+  limit: number;
+  setPage(p: number): void;
+  setLimit(l: number): void;
+  onEdit(track: Track): void;
+  onDelete(track: Track): void;
+  onUploadClick(track: Track): void;
+  onDeleteFile(track: Track): void;
+  onBulkDelete(ids: string[]): void;
+}
+
+export const TrackTable: React.FC<TrackTableProps> = ({
+  data,
+  sort,
+  order,
+  setSort,
+  setOrder,
+  page,
+  totalPages,
+  limit,
+  setPage,
+  setLimit,
+  onEdit,
+  onDelete,
+  onUploadClick,
+  onDeleteFile,
+  onBulkDelete,
+}) => {
+  const [selectionMode, setSelectionMode] = useState(false);
+  const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
+  const selectedIds = useMemo(
+    () => Object.keys(rowSelection).filter((k) => rowSelection[k]),
+    [rowSelection]
+  );
+
+  const [sorting, setSorting] = useState<SortingState>([
+    { id: sort, desc: order === "desc" },
+  ]);
+
+  useEffect(() => {
+    const first = sorting[0];
+    if (first && first.id !== "genres") {
+      setSort(first.id as keyof Track);
+      setOrder(first.desc ? "desc" : "asc");
+    }
+  }, [sorting, setSort, setOrder]);
+
+  const table = useReactTable<Track>({
+    data,
+    columns,
+    getRowId: (row) => row.id,
+    state: { sorting, rowSelection },
+    onSortingChange: setSorting,
+    onRowSelectionChange: setRowSelection,
+    enableRowSelection: true,
+    manualSorting: sorting[0]?.id !== "genres",
+    enableSortingRemoval: false,
+    getCoreRowModel: getCoreRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    meta: {
+      selectionMode,
+      onEdit,
+      onDelete,
+      onUploadClick,
+      onDeleteFile,
+    } satisfies TableMeta,
+  });
+
+  return (
+    <>
+      <SelectModeToggle
+        selectionMode={selectionMode}
+        onToggleMode={() => {
+          setSelectionMode((m) => !m);
+          if (selectionMode) setRowSelection({});
+        }}
+        selectedCount={selectedIds.length}
+        onBulkDelete={() => {
+          onBulkDelete(selectedIds);
+          setRowSelection({});
+        }}
+        bulkDeleteDisabled={selectedIds.length === 0}
+      />
+
+      <div className="overflow-x-auto">
+        <table className="table w-full table-auto mt-4">
+          <thead>
+            {table.getHeaderGroups().map((hg) => (
+              <tr key={hg.id}>
+                {hg.headers.map((header) => (
+                  <th
+                    key={header.id}
+                    onClick={header.column.getToggleSortingHandler()}
+                    className="cursor-pointer select-none"
+                    style={{ width: header.column.columnDef.size }}
+                  >
+                    {header.isPlaceholder ? null : (
+                      <>
+                        {flexRender(
+                          header.column.columnDef.header,
+                          header.getContext()
+                        )}
+                        {{
+                          asc: <ChevronUp className="inline w-4 h-4 ml-1" />,
+                          desc: <ChevronDown className="inline w-4 h-4 ml-1" />,
+                        }[header.column.getIsSorted() as string] ?? null}
+                      </>
+                    )}
+                  </th>
+                ))}
+              </tr>
+            ))}
+          </thead>
+          <tbody>
+            {table.getRowModel().rows.map((row) => (
+              <tr key={row.id}>
+                {row.getVisibleCells().map((cell) => (
+                  <td
+                    key={cell.id}
+                    style={{ width: cell.column.columnDef.size }}
+                  >
+                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <PaginationControls
+        page={page}
+        totalPages={totalPages}
+        limit={limit}
+        setPage={setPage}
+        setLimit={setLimit}
+      />
+    </>
+  );
+};
