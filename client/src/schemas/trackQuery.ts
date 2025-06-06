@@ -20,3 +20,4 @@ export const trackQuerySchema = z.object({
 });
 
 export type TrackQueryParams = z.infer<typeof trackQuerySchema>;
+export type TrackQueryInput  = z.input<typeof trackQuerySchema>;
