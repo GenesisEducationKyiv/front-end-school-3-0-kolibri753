@@ -1,31 +1,43 @@
-import { useCallback, useMemo } from "react";
+import { useCallback, useMemo, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import { pipe, R } from "@mobily/ts-belt";
-import { TRACK_QUERY_DEFAULTS } from "@/constants";
-import type { TrackQueryParams } from "@/schemas";
+
+import {
+  trackQuerySchema,
+  SCHEMA_DEFAULT_QUERY,
+  type TrackQueryParams,
+} from "@/schemas";
+import { buildSearchParams } from "./urlSearch";
 import { parseSearchParams } from "./parseSearchParams";
 
+/**
+ * URL <=> validated query + patcher
+ */
 export function useTrackQuery() {
   const [searchParams, setSearchParams] = useSearchParams();
 
-  const query: TrackQueryParams = useMemo(
+  const query = useMemo<TrackQueryParams>(
     () =>
       pipe(
         parseSearchParams(searchParams),
-        R.getWithDefault({ ...TRACK_QUERY_DEFAULTS } as TrackQueryParams)
+        R.getWithDefault(SCHEMA_DEFAULT_QUERY)
       ),
     [searchParams]
   );
 
+  useEffect(() => {
+    const normalised = buildSearchParams(query);
+    if (normalised.toString() !== searchParams.toString()) {
+      setSearchParams(normalised, { replace: true });
+    }
+  }, [query, searchParams, setSearchParams]);
+
   const patch = useCallback(
     (updates: Partial<TrackQueryParams>) => {
-      const next = new URLSearchParams(searchParams);
-      Object.entries(updates).forEach(([k, v]) =>
-        v == null || v === "" ? next.delete(k) : next.set(k, String(v))
-      );
-      setSearchParams(next, { replace: true });
+      const merged = trackQuerySchema.parse({ ...query, ...updates });
+      setSearchParams(buildSearchParams(merged), { replace: true });
     },
-    [searchParams, setSearchParams]
+    [query, setSearchParams]
   );
 
   return { query, patch };
