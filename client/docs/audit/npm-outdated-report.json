@@ -1,0 +1,114 @@
+{
+  "@hookform/resolvers": {
+    "current": "5.0.1",
+    "wanted": "5.1.1",
+    "latest": "5.1.1",
+    "dependent": "client",
+    "location": "D:\\vera\\Companies\\Genesis\\front-end-school-3-0-kolibri753\\client\\node_modules\\@hookform\\resolvers"
+  },
+  "@tailwindcss/vite": {
+    "current": "4.1.4",
+    "wanted": "4.1.10",
+    "latest": "4.1.10",
+    "dependent": "client",
+    "location": "D:\\vera\\Companies\\Genesis\\front-end-school-3-0-kolibri753\\client\\node_modules\\@tailwindcss\\vite"
+  },
+  "@types/react": {
+    "current": "19.1.2",
+    "wanted": "19.1.8",
+    "latest": "19.1.8",
+    "dependent": "client",
+    "location": "D:\\vera\\Companies\\Genesis\\front-end-school-3-0-kolibri753\\client\\node_modules\\@types\\react"
+  },
+  "@types/react-dom": {
+    "current": "19.1.2",
+    "wanted": "19.1.6",
+    "latest": "19.1.6",
+    "dependent": "client",
+    "location": "D:\\vera\\Companies\\Genesis\\front-end-school-3-0-kolibri753\\client\\node_modules\\@types\\react-dom"
+  },
+  "@vitejs/plugin-react": {
+    "current": "4.4.0",
+    "wanted": "4.5.2",
+    "latest": "4.5.2",
+    "dependent": "client",
+    "location": "D:\\vera\\Companies\\Genesis\\front-end-school-3-0-kolibri753\\client\\node_modules\\@vitejs\\plugin-react"
+  },
+  "axios": {
+    "current": "1.8.4",
+    "wanted": "1.9.0",
+    "latest": "1.9.0",
+    "dependent": "client",
+    "location": "D:\\vera\\Companies\\Genesis\\front-end-school-3-0-kolibri753\\client\\node_modules\\axios"
+  },
+  "daisyui": {
+    "current": "5.0.27",
+    "wanted": "5.0.43",
+    "latest": "5.0.43",
+    "dependent": "client",
+    "location": "D:\\vera\\Companies\\Genesis\\front-end-school-3-0-kolibri753\\client\\node_modules\\daisyui"
+  },
+  "eslint-plugin-react-refresh": {
+    "current": "0.4.19",
+    "wanted": "0.4.20",
+    "latest": "0.4.20",
+    "dependent": "client",
+    "location": "D:\\vera\\Companies\\Genesis\\front-end-school-3-0-kolibri753\\client\\node_modules\\eslint-plugin-react-refresh"
+  },
+  "globals": {
+    "current": "16.0.0",
+    "wanted": "16.2.0",
+    "latest": "16.2.0",
+    "dependent": "client",
+    "location": "D:\\vera\\Companies\\Genesis\\front-end-school-3-0-kolibri753\\client\\node_modules\\globals"
+  },
+  "lucide-react": {
+    "current": "0.493.0",
+    "wanted": "0.493.0",
+    "latest": "0.515.0",
+    "dependent": "client",
+    "location": "D:\\vera\\Companies\\Genesis\\front-end-school-3-0-kolibri753\\client\\node_modules\\lucide-react"
+  },
+  "react-hook-form": {
+    "current": "7.56.4",
+    "wanted": "7.57.0",
+    "latest": "7.57.0",
+    "dependent": "client",
+    "location": "D:\\vera\\Companies\\Genesis\\front-end-school-3-0-kolibri753\\client\\node_modules\\react-hook-form"
+  },
+  "react-router-dom": {
+    "current": "7.6.0",
+    "wanted": "7.6.2",
+    "latest": "7.6.2",
+    "dependent": "client",
+    "location": "D:\\vera\\Companies\\Genesis\\front-end-school-3-0-kolibri753\\client\\node_modules\\react-router-dom"
+  },
+  "tailwindcss": {
+    "current": "4.1.4",
+    "wanted": "4.1.10",
+    "latest": "4.1.10",
+    "dependent": "client",
+    "location": "D:\\vera\\Companies\\Genesis\\front-end-school-3-0-kolibri753\\client\\node_modules\\tailwindcss"
+  },
+  "typescript-eslint": {
+    "current": "8.33.0",
+    "wanted": "8.34.0",
+    "latest": "8.34.0",
+    "dependent": "client",
+    "location": "D:\\vera\\Companies\\Genesis\\front-end-school-3-0-kolibri753\\client\\node_modules\\typescript-eslint"
+  },
+  "wavesurfer.js": {
+    "current": "7.9.4",
+    "wanted": "7.9.5",
+    "latest": "7.9.5",
+    "dependent": "client",
+    "location": "D:\\vera\\Companies\\Genesis\\front-end-school-3-0-kolibri753\\client\\node_modules\\wavesurfer.js"
+  },
+  "zod": {
+    "current": "3.25.42",
+    "wanted": "3.25.64",
+    "latest": "3.25.64",
+    "dependent": "client",
+    "location": "D:\\vera\\Companies\\Genesis\\front-end-school-3-0-kolibri753\\client\\node_modules\\zod"
+  }
+}
