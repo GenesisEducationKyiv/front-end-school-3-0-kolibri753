@@ -1,0 +1,161 @@
+{
+  "version": "0.0.0",
+  "name": "client",
+  "dependencies": {
+    "@eslint/js": {
+      "version": "9.28.0",
+      "resolved": "https://registry.npmjs.org/@eslint/js/-/js-9.28.0.tgz",
+      "overridden": false
+    },
+    "@hookform/resolvers": {
+      "version": "5.0.1",
+      "resolved": "https://registry.npmjs.org/@hookform/resolvers/-/resolvers-5.0.1.tgz",
+      "overridden": false
+    },
+    "@mobily/ts-belt": {
+      "version": "3.13.1",
+      "resolved": "https://registry.npmjs.org/@mobily/ts-belt/-/ts-belt-3.13.1.tgz",
+      "overridden": false
+    },
+    "@tailwindcss/vite": {
+      "version": "4.1.4",
+      "resolved": "https://registry.npmjs.org/@tailwindcss/vite/-/vite-4.1.4.tgz",
+      "overridden": false
+    },
+    "@tanstack/react-table": {
+      "version": "8.21.3",
+      "resolved": "https://registry.npmjs.org/@tanstack/react-table/-/react-table-8.21.3.tgz",
+      "overridden": false
+    },
+    "@tsconfig/vite-react": {
+      "version": "6.3.5",
+      "resolved": "https://registry.npmjs.org/@tsconfig/vite-react/-/vite-react-6.3.5.tgz",
+      "overridden": false
+    },
+    "@types/react-dom": {
+      "version": "19.1.2",
+      "resolved": "https://registry.npmjs.org/@types/react-dom/-/react-dom-19.1.2.tgz",
+      "overridden": false
+    },
+    "@types/react": {
+      "version": "19.1.2",
+      "resolved": "https://registry.npmjs.org/@types/react/-/react-19.1.2.tgz",
+      "overridden": false
+    },
+    "@vitejs/plugin-react": {
+      "version": "4.4.0",
+      "resolved": "https://registry.npmjs.org/@vitejs/plugin-react/-/plugin-react-4.4.0.tgz",
+      "overridden": false
+    },
+    "axios": {
+      "version": "1.8.4",
+      "resolved": "https://registry.npmjs.org/axios/-/axios-1.8.4.tgz",
+      "overridden": false
+    },
+    "clsx": {
+      "version": "2.1.1",
+      "resolved": "https://registry.npmjs.org/clsx/-/clsx-2.1.1.tgz",
+      "overridden": false
+    },
+    "daisyui": {
+      "version": "5.0.27",
+      "resolved": "https://registry.npmjs.org/daisyui/-/daisyui-5.0.27.tgz",
+      "overridden": false
+    },
+    "eslint-plugin-neverthrow": {
+      "version": "1.1.4",
+      "resolved": "https://registry.npmjs.org/eslint-plugin-neverthrow/-/eslint-plugin-neverthrow-1.1.4.tgz",
+      "overridden": false
+    },
+    "eslint-plugin-react-hooks": {
+      "version": "5.2.0",
+      "resolved": "https://registry.npmjs.org/eslint-plugin-react-hooks/-/eslint-plugin-react-hooks-5.2.0.tgz",
+      "overridden": false
+    },
+    "eslint-plugin-react-refresh": {
+      "version": "0.4.19",
+      "resolved": "https://registry.npmjs.org/eslint-plugin-react-refresh/-/eslint-plugin-react-refresh-0.4.19.tgz",
+      "overridden": false
+    },
+    "eslint": {
+      "version": "9.28.0",
+      "resolved": "https://registry.npmjs.org/eslint/-/eslint-9.28.0.tgz",
+      "overridden": false
+    },
+    "globals": {
+      "version": "16.0.0",
+      "resolved": "https://registry.npmjs.org/globals/-/globals-16.0.0.tgz",
+      "overridden": false
+    },
+    "lucide-react": {
+      "version": "0.493.0",
+      "resolved": "https://registry.npmjs.org/lucide-react/-/lucide-react-0.493.0.tgz",
+      "overridden": false
+    },
+    "neverthrow": {
+      "version": "8.2.0",
+      "resolved": "https://registry.npmjs.org/neverthrow/-/neverthrow-8.2.0.tgz",
+      "overridden": false
+    },
+    "react-dom": {
+      "version": "19.1.0",
+      "resolved": "https://registry.npmjs.org/react-dom/-/react-dom-19.1.0.tgz",
+      "overridden": false
+    },
+    "react-hook-form": {
+      "version": "7.56.4",
+      "resolved": "https://registry.npmjs.org/react-hook-form/-/react-hook-form-7.56.4.tgz",
+      "overridden": false
+    },
+    "react-router-dom": {
+      "version": "7.6.0",
+      "resolved": "https://registry.npmjs.org/react-router-dom/-/react-router-dom-7.6.0.tgz",
+      "overridden": false
+    },
+    "react-toastify": {
+      "version": "11.0.5",
+      "resolved": "https://registry.npmjs.org/react-toastify/-/react-toastify-11.0.5.tgz",
+      "overridden": false
+    },
+    "react": {
+      "version": "19.1.0",
+      "resolved": "https://registry.npmjs.org/react/-/react-19.1.0.tgz",
+      "overridden": false
+    },
+    "tailwindcss": {
+      "version": "4.1.4",
+      "resolved": "https://registry.npmjs.org/tailwindcss/-/tailwindcss-4.1.4.tgz",
+      "overridden": false
+    },
+    "typescript-eslint": {
+      "version": "8.33.0",
+      "resolved": "https://registry.npmjs.org/typescript-eslint/-/typescript-eslint-8.33.0.tgz",
+      "overridden": false
+    },
+    "typescript": {
+      "version": "5.8.3",
+      "resolved": "https://registry.npmjs.org/typescript/-/typescript-5.8.3.tgz",
+      "overridden": false
+    },
+    "vite-plugin-svgr": {
+      "version": "4.3.0",
+      "resolved": "https://registry.npmjs.org/vite-plugin-svgr/-/vite-plugin-svgr-4.3.0.tgz",
+      "overridden": false
+    },
+    "vite": {
+      "version": "6.3.5",
+      "resolved": "https://registry.npmjs.org/vite/-/vite-6.3.5.tgz",
+      "overridden": false
+    },
+    "wavesurfer.js": {
+      "version": "7.9.4",
+      "resolved": "https://registry.npmjs.org/wavesurfer.js/-/wavesurfer.js-7.9.4.tgz",
+      "overridden": false
+    },
+    "zod": {
+      "version": "3.25.42",
+      "resolved": "https://registry.npmjs.org/zod/-/zod-3.25.42.tgz",
+      "overridden": false
+    }
+  }
+}
