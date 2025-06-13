@@ -2,36 +2,29 @@ import { useState, useEffect, useCallback } from "react";
 import { trackService } from "@/api";
 import type { Track, Meta } from "@/types";
 import type { AppError } from "@/api/errors";
+import { useTrackQuery } from "@/lib";
 
 /**
- * Fetch and control paged track data
+ * Fetch paginated tracks, params come from URL
  */
-export function useTracks(initialLimit = 10) {
+export function useTracks() {
+  const { query, patch } = useTrackQuery();
+  const { page, limit } = query;
+
   const [data, setData] = useState<Track[]>([]);
   const [meta, setMeta] = useState<Meta>({
     total: 0,
-    page: 1,
-    limit: initialLimit,
+    page,
+    limit,
     totalPages: 1,
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<AppError | null>(null);
 
-  const [page, setPage] = useState(1);
-  const [limit, setLimit] = useState(initialLimit);
-  const [sort, setSort] = useState<keyof Track>("title");
-  const [order, setOrder] = useState<"asc" | "desc">("asc");
-  const [genre, setGenre] = useState("");
-  const [artist, setArtist] = useState("");
-  const [search, setSearch] = useState("");
-
   const fetchData = useCallback(
     async (signal?: AbortSignal) => {
       setLoading(true);
-      const res = await trackService.fetchTracks(
-        { page, limit, sort, order, genre, artist, search },
-        signal
-      );
+      const res = await trackService.fetchTracks(query, signal);
 
       res.match(
         ({ data: list, meta: m }) => {
@@ -41,10 +34,9 @@ export function useTracks(initialLimit = 10) {
         },
         (e) => setError(e)
       );
-
       setLoading(false);
     },
-    [page, limit, sort, order, genre, artist, search]
+    [query]
   );
 
   useEffect(() => {
@@ -53,25 +45,5 @@ export function useTracks(initialLimit = 10) {
     return () => ctrl.abort();
   }, [fetchData]);
 
-  return {
-    data,
-    meta,
-    loading,
-    error,
-    page,
-    limit,
-    sort,
-    order,
-    genre,
-    artist,
-    search,
-    setPage,
-    setLimit,
-    setSort,
-    setOrder,
-    setGenre,
-    setArtist,
-    setSearch,
-    refetch: () => fetchData(),
-  };
+  return { data, meta, loading, error, refetch: fetchData, patch };
 }

@@ -2,8 +2,12 @@ import type { Result } from "neverthrow";
 import { BaseService } from "./baseService";
 import type { IHttpClient } from "./httpClient";
 import type { AppError } from "./errors";
-import type { Track, Paginated, FetchTracksOptions } from "@/types";
-import type { TrackFormData } from "@/schemas";
+import type { Track, Paginated } from "@/types";
+import {
+  trackQuerySchema,
+  type TrackFormData,
+  type TrackQueryInput,
+} from "@/schemas";
 
 /**
  * TrackService — thin wrapper over /api/tracks endpoints.
@@ -26,12 +30,12 @@ export class TrackService extends BaseService<Track, TrackFormData> {
    * GET /tracks (paginated)
    */
   fetchTracks(
-    opts: FetchTracksOptions = {},
+    opts: TrackQueryInput = {},
     signal?: AbortSignal
   ): Promise<Result<Paginated<Track>, AppError>> {
-    const { page = 1, limit = 10, ...filters } = opts;
+    const params = trackQuerySchema.parse(opts);
     return this.http.get<Paginated<Track>>(`/api/${TrackService.resource}`, {
-      params: { page, limit, ...filters },
+      params,
       signal,
     });
   }

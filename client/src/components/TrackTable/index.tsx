@@ -17,13 +17,10 @@ export interface TrackTableProps {
   data: Track[];
   sort: keyof Track;
   order: "asc" | "desc";
-  setSort(v: keyof Track): void;
-  setOrder(v: "asc" | "desc"): void;
   page: number;
   totalPages: number;
   limit: number;
-  setPage(p: number): void;
-  setLimit(l: number): void;
+  patch(q: Record<string, string | number | undefined>): void;
   onEdit(track: Track): void;
   onDelete(track: Track): void;
   onUploadClick(track: Track): void;
@@ -35,13 +32,10 @@ export const TrackTable: React.FC<TrackTableProps> = ({
   data,
   sort,
   order,
-  setSort,
-  setOrder,
   page,
   totalPages,
   limit,
-  setPage,
-  setLimit,
+  patch,
   onEdit,
   onDelete,
   onUploadClick,
@@ -62,10 +56,9 @@ export const TrackTable: React.FC<TrackTableProps> = ({
   useEffect(() => {
     const first = sorting[0];
     if (first && first.id !== "genres") {
-      setSort(first.id as keyof Track);
-      setOrder(first.desc ? "desc" : "asc");
+      patch({ sort: first.id, order: first.desc ? "desc" : "asc" });
     }
-  }, [sorting, setSort, setOrder]);
+  }, [sorting, patch]);
 
   const table = useReactTable<Track>({
     data,
@@ -154,8 +147,7 @@ export const TrackTable: React.FC<TrackTableProps> = ({
         page={page}
         totalPages={totalPages}
         limit={limit}
-        setPage={setPage}
-        setLimit={setLimit}
+        patch={patch}
       />
     </>
   );
