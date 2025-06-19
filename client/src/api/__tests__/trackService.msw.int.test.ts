@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { http, HttpResponse } from "msw";
 import axios from "axios";
-import { server } from "../../../test/msw/server";
+import { server } from "../../../tests/msw/server";
 import { AxiosHttpClient } from "@/api/httpClient";
 import { TrackService } from "@/api/trackService";
 import type { Track } from "@/types";
