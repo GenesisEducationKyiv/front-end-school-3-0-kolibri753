@@ -204,7 +204,7 @@ export class TracksPage {
       for (const genre of data.genres) {
         try {
           await this.genresSelect.selectOption(genre, { timeout: 3000 });
-        } catch (error) {
+        } catch {
           console.warn(`Skipping genre: ${genre}`);
         }
       }

@@ -73,11 +73,8 @@ export class ApiMockHelper {
   }
 
   async mockTrackCrudOperations() {
-    // Mock individual track operations
     await this.page.route("/api/tracks/*", async (route) => {
       const method = route.request().method();
-      const url = route.request().url();
-      const trackId = url.split("/").pop();
 
       if (method === "PUT") {
         await route.fulfill({
@@ -94,7 +91,6 @@ export class ApiMockHelper {
       }
     });
 
-    // Mock bulk delete
     await this.page.route("/api/tracks/delete", async (route) => {
       if (route.request().method() === "POST") {
         await route.fulfill({
