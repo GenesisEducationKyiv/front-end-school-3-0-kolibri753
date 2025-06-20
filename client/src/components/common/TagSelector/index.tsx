@@ -45,6 +45,7 @@ export function TagSelector({
         onChange={handleAdd}
         disabled={isSelectDisabled}
         aria-disabled={isSelectDisabled}
+        data-testid="track-form-genres-select"
       >
         {loading && <option>Loading…</option>}
         {error && <option>Error</option>}

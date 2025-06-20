@@ -98,7 +98,10 @@ export const TrackTable: React.FC<TrackTableProps> = ({
       />
 
       <div className="overflow-x-auto">
-        <table className="table w-full table-auto mt-4">
+        <table
+          className="table w-full table-auto mt-4"
+          data-testid="tracks-table"
+        >
           <thead>
             {table.getHeaderGroups().map((hg) => (
               <tr key={hg.id}>

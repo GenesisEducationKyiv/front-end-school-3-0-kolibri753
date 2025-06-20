@@ -29,6 +29,7 @@ export function TrackFormFields({
           {...register("title")}
           className="input input-bordered w-full"
           disabled={disabled}
+          data-testid="track-form-title"
         />
         {errors.title && (
           <p className="text-error text-sm mt-1">{errors.title.message}</p>
@@ -43,6 +44,7 @@ export function TrackFormFields({
           {...register("artist")}
           className="input input-bordered w-full"
           disabled={disabled}
+          data-testid="track-form-artist"
         />
         {errors.artist && (
           <p className="text-error text-sm mt-1">{errors.artist.message}</p>
@@ -57,6 +59,7 @@ export function TrackFormFields({
           {...register("album")}
           className="input input-bordered w-full"
           disabled={disabled}
+          data-testid="track-form-album"
         />
       </div>
 
@@ -73,6 +76,7 @@ export function TrackFormFields({
               options={genres.list}
               loading={genres.loading}
               error={!!genres.error}
+              data-testid="track-form-genres"
             />
           )}
         />
@@ -89,6 +93,7 @@ export function TrackFormFields({
           {...register("coverImage")}
           className="input input-bordered w-full"
           disabled={disabled}
+          data-testid="track-form-cover-image"
         />
         {errors.coverImage && (
           <p className="text-error text-sm mt-1">{errors.coverImage.message}</p>

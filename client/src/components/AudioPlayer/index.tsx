@@ -65,7 +65,7 @@ export function AudioPlayer({ src, id, onRemove }: AudioPlayerProps) {
           <button
             className="btn btn-xs btn-ghost btn-error btn-circle"
             onClick={onRemove}
-            data-testid={`delete-track-${id}`}
+            data-testid={`delete-track-audio-${id}`}
             aria-label="Remove audio"
           >
             <X size={12} />
@@ -106,7 +106,7 @@ export function AudioPlayer({ src, id, onRemove }: AudioPlayerProps) {
           type="button"
           className="btn btn-xs btn-circle btn-error btn-ghost"
           onClick={onRemove}
-          data-testid={`delete-track-${id}`}
+          data-testid={`delete-track-audio-${id}`}
           aria-label="Remove audio"
         >
           <X size={12} />
