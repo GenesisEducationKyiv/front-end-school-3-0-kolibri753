@@ -15,4 +15,3 @@ export {
   ErrorMessage,
 } from "./common";
 export { Header, Footer } from "./layout";
-export { AudioPlayer } from "./AudioPlayer";

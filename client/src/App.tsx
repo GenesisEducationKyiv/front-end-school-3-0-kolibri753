@@ -1,7 +1,8 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import { useTheme } from "@/hooks";
-import { Footer, Header, AudioPlayer } from "@/components";
+import { Footer, Header } from "@/components";
+import { AudioPlayer } from "@/features";
 import TracksPage from "@/pages/TracksPage";
 import "react-toastify/dist/ReactToastify.css";
 
