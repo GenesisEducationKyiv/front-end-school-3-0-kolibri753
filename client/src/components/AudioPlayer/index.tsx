@@ -1,117 +1,63 @@
-import { useRef, useEffect, useCallback, useState } from "react";
-import WaveSurfer from "wavesurfer.js";
-import { Play, Pause, X } from "lucide-react";
+import { X } from "lucide-react";
+import { useAudioPlayer } from "@/stores";
+import { useAudioElement, useWaveform } from "./hooks";
+import {
+  TrackInfo,
+  PlaybackControls,
+  Waveform,
+  ErrorState,
+  TimeDisplay,
+} from "./components";
 
-interface AudioPlayerProps {
-  src: string;
-  id: string;
-  onRemove?: () => void;
-}
+export function AudioPlayer() {
+  const { currentTrack, isPlaying, togglePlay, stop } = useAudioPlayer();
+  const { audioRef, error } = useAudioElement();
+  const { waveformRef, isWaveformLoading } = useWaveform({
+    audioRef,
+    currentTrack,
+    isPlaying,
+  });
 
-export function AudioPlayer({ src, id, onRemove }: AudioPlayerProps) {
-  const waveformRef = useRef<HTMLDivElement>(null);
-  const audioRef = useRef<HTMLAudioElement>(null);
-  const wsRef = useRef<WaveSurfer | null>(null);
-  const [playing, setPlaying] = useState(false);
-  const [error, setError] = useState(false);
-
-  useEffect(() => {
-    if (!waveformRef.current || !audioRef.current) return;
-    setError(false);
-
-    const audioEl = audioRef.current;
-    const handleAudioError = () => setError(true);
-    audioEl.addEventListener("error", handleAudioError);
-
-    const ws = WaveSurfer.create({
-      container: waveformRef.current,
-      backend: "MediaElement",
-      media: audioEl,
-      url: src,
-      waveColor: "#CBD5E1",
-      progressColor: "#1E40AF",
-      cursorColor: "#1E40AF",
-      height: 48,
-      barWidth: 2,
-      normalize: true,
-      interact: true,
-    });
-
-    wsRef.current = ws;
-    ws.on("play", () => setPlaying(true));
-    ws.on("pause", () => setPlaying(false));
-    ws.on("error", () => setError(true));
-
-    return () => {
-      audioEl.removeEventListener("error", handleAudioError);
-      ws.destroy();
-      wsRef.current = null;
-    };
-  }, [src]);
-
-  const togglePlay = useCallback(() => {
-    if (!wsRef.current || error) return;
-    wsRef.current.playPause();
-  }, [error]);
+  if (!currentTrack) {
+    return null;
+  }
 
   if (error) {
-    return (
-      <div
-        className="alert alert-error flex items-center justify-between"
-        data-testid={`audio-error-${id}`}
-      >
-        <span>File is corrupted</span>
-        {onRemove && (
-          <button
-            className="btn btn-xs btn-ghost btn-error btn-circle"
-            onClick={onRemove}
-            data-testid={`delete-track-audio-${id}`}
-            aria-label="Remove audio"
-          >
-            <X size={12} />
-          </button>
-        )}
-      </div>
-    );
+    return <ErrorState track={currentTrack} onClose={stop} />;
   }
 
   return (
-    <div className="flex items-center gap-2" data-testid={`audio-player-${id}`}>
-      <audio
-        ref={audioRef}
-        src={src}
-        preload="auto"
-        className="hidden"
-        data-testid={`audio-element-${id}`}
-      />
+    <div className="fixed bottom-0 left-0 right-0 bg-base-100 border-t border-base-300 p-4 shadow-lg">
+      <div className="flex flex-wrap md:flex-nowrap items-center gap-x-4 gap-y-2 max-w-6xl mx-auto">
+        <div className="order-1 shrink-0">
+          <TrackInfo track={currentTrack} />
+        </div>
+        <div className="order-1 ml-auto shrink-0">
+          <PlaybackControls
+            isPlaying={isPlaying}
+            onTogglePlay={() => togglePlay()}
+          />
+        </div>
 
-      <button
-        type="button"
-        onClick={togglePlay}
-        data-testid={playing ? `pause-button-${id}` : `play-button-${id}`}
-        className="btn btn-xs btn-outline"
-        aria-label={playing ? "Pause" : "Play"}
-      >
-        {playing ? <Pause size={16} /> : <Play size={16} />}
-      </button>
+        <div className="order-2 w-full min-w-0">
+          <Waveform
+            audioRef={audioRef}
+            waveformRef={waveformRef}
+            isLoading={isWaveformLoading}
+          />
+        </div>
 
-      <div
-        ref={waveformRef}
-        className="flex-1 min-w-36 overflow-hidden cursor-pointer"
-        data-testid={`audio-progress-${id}`}
-      />
-
-      {onRemove && (
+        <div className="order-3 shrink-0">
+          <TimeDisplay />
+        </div>
         <button
-          type="button"
-          className="btn btn-xs btn-circle btn-error btn-ghost"
-          onClick={onRemove}
-          data-testid={`delete-track-audio-${id}`}
-          aria-label="Remove audio"
+          className="order-3 ml-auto btn btn-sm btn-ghost shrink-0"
+          onClick={stop}
+          aria-label="Close player"
         >
-          <X size={12} />
+          <X size={20} />
         </button>
-      )}
+      </div>
     </div>
   );
 }

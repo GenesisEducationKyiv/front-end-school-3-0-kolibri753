@@ -1,8 +1,8 @@
 import { type ColumnDef } from "@tanstack/react-table";
 import BackupCoverUrl from "@/assets/logo.svg";
 import { Edit2, Trash2 } from "lucide-react";
-import type { Track } from "@/types/track";
-import { AudioPlayer } from "@/components";
+import type { Track } from "@/types";
+import { TrackPlayer } from "@/components";
 
 export interface TableMeta {
   selectionMode: boolean;
@@ -15,7 +15,7 @@ export interface TableMeta {
 export const columns: ColumnDef<Track, unknown>[] = [
   {
     id: "select",
-    size: 40,
+    size: 0,
     enableSorting: false,
     header: ({ table }) => {
       const { selectionMode } = table.options.meta as TableMeta;
@@ -55,6 +55,7 @@ export const columns: ColumnDef<Track, unknown>[] = [
       );
     },
   },
+
   {
     accessorKey: "title",
     header: "Title",
@@ -104,25 +105,35 @@ export const columns: ColumnDef<Track, unknown>[] = [
     id: "audio",
     header: "Audio",
     enableSorting: false,
-    size: 300,
+    size: 40,
     cell: ({ row, table }) => {
       const track = row.original;
       const { onUploadClick, onDeleteFile } = table.options.meta as TableMeta;
 
-      return track.audioFile ? (
-        <AudioPlayer
-          src={`/api/files/${track.audioFile}`}
-          id={track.id}
+      if (!track.audioFile) {
+        return (
+          <button
+            className="btn btn-xs"
+            onClick={() => onUploadClick(track)}
+            data-testid={`upload-track-${track.id}`}
+          >
+            Upload
+          </button>
+        );
+      }
+
+      return (
+        <TrackPlayer
+          track={{
+            id: track.id,
+            title: track.title,
+            artist: track.artist,
+            src: `/api/files/${track.audioFile}`,
+            cover: track.coverImage,
+          }}
           onRemove={() => onDeleteFile(track)}
+          showRemove={true}
         />
-      ) : (
-        <button
-          className="btn btn-xs"
-          onClick={() => onUploadClick(track)}
-          data-testid={`upload-track-${track.id}`}
-        >
-          Upload
-        </button>
       );
     },
   },
