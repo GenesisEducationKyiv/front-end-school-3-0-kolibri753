@@ -1,5 +1,6 @@
 import { TrackFormFields } from "./fields";
 import { useTrackForm } from "@/hooks";
+import { LoadingSpinner } from "@/components";
 import type { TrackFormData } from "@/schemas";
 import type { ResourceState } from "@/types";
 
@@ -51,14 +52,7 @@ export function TrackForm({ initialData, genres, onSubmit, onCancel }: Props) {
           disabled={isSubmitting}
           aria-disabled={isSubmitting}
         >
-          {isSubmitting ? (
-            <span
-              data-testid="loading-indicator"
-              className="loading loading-spinner loading-xs"
-            />
-          ) : (
-            "Save"
-          )}
+          {isSubmitting ? <LoadingSpinner size="xs" /> : "Save"}
         </button>
       </div>
     </form>
