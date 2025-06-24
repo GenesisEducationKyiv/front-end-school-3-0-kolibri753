@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from "react";
+import React, { useEffect } from "react";
 import {
   useTrackModals,
   useTracksQuery,
@@ -22,7 +22,10 @@ import {
   ErrorMessage,
 } from "@/components";
 import type { TrackFormData } from "@/schemas";
-import { useTrackQuery } from "@/lib/useTrackQuery";
+import { useTrackQuery } from "@/lib";
+import { TRACK_QUERY_DEFAULTS } from "@/constants";
+import { extractErrorMessage } from "@/helpers";
+import { toRefreshableResourceState, toResourceState } from "./helpers";
 
 const TracksPage: React.FC = () => {
   const { query: queryParams, patch: updateQueryParams } = useTrackQuery();
@@ -58,9 +61,15 @@ const TracksPage: React.FC = () => {
     }
   }, [queryParams.page, tracksQuery.data?.meta, updateQueryParams]);
 
-  const isLoading =
-    tracksQuery.isLoading || artistsQuery.isLoading || genresQuery.isLoading;
-  const hasError = tracksQuery.error || artistsQuery.error || genresQuery.error;
+  const isPending =
+    tracksQuery.isPending || artistsQuery.isPending || genresQuery.isPending;
+
+  const hasActiveFilters = !!(
+    queryParams.search ||
+    queryParams.artist ||
+    queryParams.genre
+  );
+  const resetFilters = () => updateQueryParams({ ...TRACK_QUERY_DEFAULTS });
 
   const retryAll = () => {
     tracksQuery.refetch();
@@ -68,33 +77,7 @@ const TracksPage: React.FC = () => {
     genresQuery.refetch();
   };
 
-  const tableData = useMemo(
-    () => tracksQuery.data?.data ?? [],
-    [tracksQuery.data?.data]
-  );
-
-  const artists = useMemo(
-    () => ({
-      list: artistsQuery.data ?? [],
-      loading: artistsQuery.isLoading,
-      error: artistsQuery.error
-        ? { type: "Unknown" as const, message: "Failed to load artists" }
-        : null,
-      refetch: artistsQuery.refetch,
-    }),
-    [artistsQuery]
-  );
-
-  const genres = useMemo(
-    () => ({
-      list: genresQuery.data ?? [],
-      loading: genresQuery.isLoading,
-      error: genresQuery.error
-        ? { type: "Unknown" as const, message: "Failed to load genres" }
-        : null,
-    }),
-    [genresQuery]
-  );
+  const tableData = tracksQuery.data?.data ?? [];
 
   const handleCreate = async (form: TrackFormData) => {
     await createTrackMutation.mutateAsync(form);
@@ -143,12 +126,7 @@ const TracksPage: React.FC = () => {
     closeModal();
   };
 
-  if (
-    isLoading &&
-    !tracksQuery.data &&
-    !artistsQuery.data &&
-    !genresQuery.data
-  ) {
+  if (isPending) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <LoadingSpinner size="lg" />
@@ -156,10 +134,13 @@ const TracksPage: React.FC = () => {
     );
   }
 
-  if (hasError && !tracksQuery.data) {
+  if (tracksQuery.isError) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <ErrorMessage message="Failed to load page data" onRetry={retryAll} />
+        <ErrorMessage
+          message={extractErrorMessage(tracksQuery.error)}
+          onRetry={retryAll}
+        />
       </div>
     );
   }
@@ -186,8 +167,8 @@ const TracksPage: React.FC = () => {
         </div>
 
         <TrackToolbar
-          artists={artists}
-          genres={genres}
+          artists={toRefreshableResourceState(artistsQuery)}
+          genres={toResourceState(genresQuery)}
           filterArtist={queryParams.artist}
           setFilterArtist={(v) => updateQueryParams({ artist: v, page: 1 })}
           filterGenre={queryParams.genre}
@@ -196,26 +177,45 @@ const TracksPage: React.FC = () => {
           setSearch={(v) => updateQueryParams({ search: v, page: 1 })}
         />
 
-        <TrackTable
-          data={tableData}
-          sort={queryParams.sort}
-          order={queryParams.order}
-          page={queryParams.page}
-          totalPages={meta.totalPages}
-          limit={queryParams.limit}
-          patch={updateQueryParams}
-          onEdit={openEdit}
-          onDelete={openDelete}
-          onUploadClick={openUpload}
-          onDeleteFile={openDeleteFile}
-          onBulkDelete={openBulkDelete}
-        />
+        {tableData.length === 0 ? (
+          <div className="text-center py-12">
+            <p className="text-gray-500 text-lg mb-4">
+              {hasActiveFilters
+                ? "No tracks found matching your criteria"
+                : "No tracks available"}
+            </p>
+            {hasActiveFilters && (
+              <button
+                className="btn btn-outline btn-sm"
+                onClick={resetFilters}
+                data-testid="reset-filters-button"
+              >
+                Reset Filters
+              </button>
+            )}
+          </div>
+        ) : (
+          <TrackTable
+            data={tableData}
+            sort={queryParams.sort}
+            order={queryParams.order}
+            page={queryParams.page}
+            totalPages={meta.totalPages}
+            limit={queryParams.limit}
+            patch={updateQueryParams}
+            onEdit={openEdit}
+            onDelete={openDelete}
+            onUploadClick={openUpload}
+            onDeleteFile={openDeleteFile}
+            onBulkDelete={openBulkDelete}
+          />
+        )}
 
         {modalType === "create" && (
           <Modal onClose={closeModal}>
             <TrackForm
               onSubmit={handleCreate}
-              genres={genres}
+              genres={toResourceState(genresQuery)}
               onCancel={closeModal}
             />
           </Modal>
@@ -225,7 +225,7 @@ const TracksPage: React.FC = () => {
           <Modal onClose={closeModal}>
             <TrackForm
               initialData={modalTrack}
-              genres={genres}
+              genres={toResourceState(genresQuery)}
               onSubmit={handleUpdate}
               onCancel={closeModal}
             />
@@ -256,7 +256,7 @@ const TracksPage: React.FC = () => {
           />
         )}
 
-        {bulkDeleteIds.length > 0 && (
+        {modalType === "bulkDelete" && bulkDeleteIds.length > 0 && (
           <DeleteConfirmationModal
             title={`Delete ${bulkDeleteIds.length} track${
               bulkDeleteIds.length > 1 ? "s" : ""
