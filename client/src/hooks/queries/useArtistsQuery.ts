@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { artistService } from "@/api";
-import { QUERY_KEYS, QUERY_CONFIG } from "@/constants";
+import { QUERY_KEYS } from "@/constants";
 import { defaultRetry } from "./utils";
 
 export function useArtistsQuery() {
@@ -13,7 +13,6 @@ export function useArtistsQuery() {
       }
       return result.value;
     },
-    staleTime: QUERY_CONFIG.staleTime,
     retry: defaultRetry,
   });
 }

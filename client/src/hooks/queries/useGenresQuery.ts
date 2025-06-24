@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { genreService } from "@/api";
-import { QUERY_KEYS, QUERY_CONFIG } from "@/constants";
+import { QUERY_KEYS } from "@/constants";
 import { defaultRetry } from "./utils";
 
 export function useGenresQuery() {
@@ -13,7 +13,6 @@ export function useGenresQuery() {
       }
       return result.value;
     },
-    staleTime: QUERY_CONFIG.staleTime,
     retry: defaultRetry,
   });
 }

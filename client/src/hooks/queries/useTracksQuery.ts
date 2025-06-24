@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { trackService } from "@/api";
-import { QUERY_KEYS, QUERY_CONFIG } from "@/constants";
+import { QUERY_KEYS } from "@/constants";
 import type { TrackQueryParams } from "@/schemas";
 import { defaultRetry } from "./utils";
 
@@ -14,7 +14,6 @@ export function useTracksQuery(params: TrackQueryParams) {
       }
       return result.value;
     },
-    staleTime: QUERY_CONFIG.staleTime,
     retry: defaultRetry,
   });
 }
