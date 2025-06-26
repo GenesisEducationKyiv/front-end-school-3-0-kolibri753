@@ -25,6 +25,7 @@ import {
   PaginatedResponse,
   BatchDeleteResponse,
 } from "../types";
+import { nowPlayingService } from "../services/now-playing.service";
 
 /**
  * Get all tracks with pagination, sorting, and filtering
@@ -120,6 +121,8 @@ export const addTrack: RouteHandler<CreateTrackRequest> = async (
       slug,
     });
 
+    await nowPlayingService.cacheTracks();
+
     return reply.code(201).send(newTrack);
   } catch (error) {
     request.log.error(error);
@@ -164,6 +167,8 @@ export const updateTrackById: RouteHandler<UpdateTrackParams> = async (
 
     const updatedTrack = await updateTrack(id, updates);
 
+    await nowPlayingService.cacheTracks();
+
     return reply.code(200).send(updatedTrack);
   } catch (error) {
     request.log.error(error);
@@ -187,6 +192,8 @@ export const removeTrack: RouteHandler<GetTrackByIdParams> = async (
       return reply.code(404).send({ error: "Track not found" });
     }
 
+    await nowPlayingService.cacheTracks();
+
     return reply.code(204).send();
   } catch (error) {
     request.log.error(error);
@@ -209,6 +216,8 @@ export const removeTracks: RouteHandler<DeleteTracksRequest> = async (
     }
 
     const results: BatchDeleteResponse = await deleteMultipleTracks(ids);
+
+    await nowPlayingService.cacheTracks();
 
     return reply.code(200).send(results);
   } catch (error) {
