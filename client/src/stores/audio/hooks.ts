@@ -57,12 +57,6 @@ export const useAudioProgress = () => {
 
   const progress = duration > 0 ? (currentTime / duration) * 100 : 0;
 
-  const formatTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = Math.floor(seconds % 60);
-    return `${mins}:${secs.toString().padStart(2, "0")}`;
-  };
-
   return {
     currentTime,
     duration,
@@ -70,7 +64,6 @@ export const useAudioProgress = () => {
     seek,
     setCurrentTime,
     setDuration,
-    formatTime,
   };
 };
 
