@@ -1,28 +1,24 @@
 import { useAudioStore } from "./store";
 import type { AudioTrack } from "./types";
 
-export const useAudioPlayer = () => {
+export const useAudioTrack = () => {
   const store = useAudioStore();
 
   const togglePlay = (track?: AudioTrack) => {
-    if (!store.currentTrack && !track) return;
+    if (!track && !store.currentTrack) return;
+
     if (track) {
-      if (store.currentTrack?.id === track.id) {
-        if (store.isPlaying) {
-          store.pause();
-        } else {
-          store.resume();
-        }
+      const isSameTrack = store.currentTrack?.id === track.id;
+
+      if (isSameTrack) {
+        store.isPlaying ? store.pause() : store.resume();
       } else {
         store.play(track);
       }
-    } else {
-      if (store.isPlaying) {
-        store.pause();
-      } else {
-        store.resume();
-      }
+      return;
     }
+
+    store.isPlaying ? store.pause() : store.resume();
   };
 
   const isCurrentTrack = (trackId: string) => {

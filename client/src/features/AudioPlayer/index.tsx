@@ -1,5 +1,5 @@
 import { X } from "lucide-react";
-import { useAudioPlayer } from "@/stores";
+import { useAudioTrack } from "@/stores";
 import { useAudioElement, useWaveform } from "./hooks";
 import {
   TrackInfo,
@@ -10,7 +10,7 @@ import {
 } from "./components";
 
 export function AudioPlayer() {
-  const { currentTrack, isPlaying, togglePlay, stop } = useAudioPlayer();
+  const { currentTrack, isPlaying, togglePlay, stop } = useAudioTrack();
   const { audioRef, error } = useAudioElement();
   const { waveformRef, isWaveformLoading } = useWaveform({
     audioRef,

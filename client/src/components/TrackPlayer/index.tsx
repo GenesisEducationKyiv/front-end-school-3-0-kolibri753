@@ -1,5 +1,6 @@
 import { Play, Pause, X } from "lucide-react";
-import { useAudioPlayer, type AudioTrack } from "@/stores";
+import { useAudioTrack, type AudioTrack } from "@/stores";
+import { getValidClassNames } from "@/helpers";
 
 interface TrackPlayerProps {
   track: AudioTrack;
@@ -12,10 +13,10 @@ export function TrackPlayer({
   onRemove,
   showRemove = false,
 }: TrackPlayerProps) {
-  const { isTrackPlaying, togglePlay, currentTrack } = useAudioPlayer();
+  const { togglePlay, isCurrentTrack, isTrackPlaying } = useAudioTrack();
 
+  const isCurrent = isCurrentTrack(track.id);
   const isPlaying = isTrackPlaying(track.id);
-  const isCurrentTrack = currentTrack?.id === track.id;
 
   const handleTogglePlay = () => {
     togglePlay(track);
@@ -29,9 +30,9 @@ export function TrackPlayer({
         data-testid={
           isPlaying ? `pause-button-${track.id}` : `play-button-${track.id}`
         }
-        className={`btn btn-xs ${
-          isCurrentTrack ? "btn-primary" : "btn-outline"
-        }`}
+        className={getValidClassNames(
+          `btn btn-xs ${isCurrent ? "btn-primary" : "btn-outline"}`
+        )}
         aria-label={isPlaying ? "Pause" : "Play"}
       >
         {isPlaying ? <Pause size={16} /> : <Play size={16} />}

@@ -1,10 +1,10 @@
 import { useRef, useEffect, useState } from "react";
-import { useAudioPlayer, useAudioProgress } from "@/stores";
+import { useAudioTrack, useAudioProgress } from "@/stores";
 
 export const useAudioElement = () => {
   const audioRef = useRef<HTMLAudioElement>(null);
   const [error, setError] = useState(false);
-  const { currentTrack, isPlaying } = useAudioPlayer();
+  const { currentTrack, isPlaying } = useAudioTrack();
   const { setCurrentTime, setDuration } = useAudioProgress();
 
   // Handle the main audio element (for actual playback)
