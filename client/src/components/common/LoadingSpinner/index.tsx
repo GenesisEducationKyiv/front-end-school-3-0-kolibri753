@@ -1,4 +1,3 @@
-import React from "react";
 import { getValidClassNames } from "@/helpers";
 
 interface LoadingSpinnerProps {
@@ -6,25 +5,16 @@ interface LoadingSpinnerProps {
   className?: string;
 }
 
-export const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
+export const LoadingSpinner = ({
   size = "md",
   className,
-}) => {
-  const sizeClasses = {
-    xs: "loading-xs",
-    sm: "loading-sm",
-    md: "loading-md",
-    lg: "loading-lg",
-  };
-
-  return (
-    <span
-      className={getValidClassNames(
-        "loading loading-spinner",
-        sizeClasses[size],
-        className
-      )}
-      data-testid="loading-indicator"
-    />
-  );
-};
+}: LoadingSpinnerProps) => (
+  <span
+    className={getValidClassNames(
+      "loading loading-spinner",
+      `loading-${size}`,
+      className
+    )}
+    data-testid="loading-indicator"
+  />
+);
