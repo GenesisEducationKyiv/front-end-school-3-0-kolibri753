@@ -1,5 +1,16 @@
-import React, { useEffect, useMemo, useState } from "react";
-import { useTracks, useArtists, useGenres } from "@/hooks";
+import React, { useEffect } from "react";
+import {
+  useTrackModals,
+  useTracksQuery,
+  useArtistsQuery,
+  useGenresQuery,
+  useCreateTrackMutation,
+  useUpdateTrackMutation,
+  useDeleteTrackMutation,
+  useUploadTrackFileMutation,
+  useDeleteTrackFileMutation,
+  useBulkDeleteTracksMutation,
+} from "@/hooks";
 import {
   DeleteConfirmationModal,
   Modal,
@@ -7,150 +18,138 @@ import {
   TrackTable,
   UploadFileModal,
   TrackToolbar,
+  LoadingSpinner,
+  ErrorMessage,
 } from "@/components";
-import type { Track } from "@/types";
 import type { TrackFormData } from "@/schemas";
-import { trackService } from "@/api";
-import { extractErrorMessage, showToastMessage } from "@/helpers";
 import { useTrackQuery } from "@/lib";
+import { TRACK_QUERY_DEFAULTS } from "@/constants";
+import { extractErrorMessage } from "@/helpers";
+import { toRefreshableResourceState, toResourceState } from "./helpers";
 
 const TracksPage: React.FC = () => {
-  const {
-    data,
-    meta: { totalPages },
-    refetch: refetchTracks,
-    patch,
-  } = useTracks();
-  const { query } = useTrackQuery();
-  const {
-    page,
-    limit,
-    sort,
-    order,
-    genre: filterGenre,
-    artist: filterArtist,
-    search,
-  } = query;
+  const { query: queryParams, patch: updateQueryParams } = useTrackQuery();
 
-  const memoData = useMemo(() => data, [data]);
+  const {
+    modalType,
+    modalTrack,
+    bulkDeleteIds,
+    closeModal,
+    openCreate,
+    openEdit,
+    openDelete,
+    openUpload,
+    openDeleteFile,
+    openBulkDelete,
+  } = useTrackModals();
+
+  const tracksQuery = useTracksQuery(queryParams);
+  const artistsQuery = useArtistsQuery();
+  const genresQuery = useGenresQuery();
+
+  const createTrackMutation = useCreateTrackMutation();
+  const updateTrackMutation = useUpdateTrackMutation();
+  const deleteTrackMutation = useDeleteTrackMutation();
+  const uploadFileMutation = useUploadTrackFileMutation();
+  const deleteFileMutation = useDeleteTrackFileMutation();
+  const bulkDeleteMutation = useBulkDeleteTracksMutation();
 
   useEffect(() => {
-    if (page > totalPages && totalPages >= 1) {
-      patch({ page: totalPages });
+    const meta = tracksQuery.data?.meta;
+    if (meta && queryParams.page > meta.totalPages && meta.totalPages >= 1) {
+      updateQueryParams({ page: meta.totalPages });
     }
-  }, [page, totalPages, patch]);
+  }, [queryParams.page, tracksQuery.data?.meta, updateQueryParams]);
 
-  const genres = useGenres();
-  const artists = useArtists();
+  const isPending =
+    tracksQuery.isPending || artistsQuery.isPending || genresQuery.isPending;
 
-  const [isCreating, setIsCreating] = useState(false);
-  const [editingTrack, setEditingTrack] = useState<Track | null>(null);
-  const [deletingTrack, setDeletingTrack] = useState<Track | null>(null);
-  const [uploadingTrack, setUploadingTrack] = useState<Track | null>(null);
-  const [deletingFileTrack, setDeletingFile] = useState<Track | null>(null);
-  const [bulkDeleteIds, setBulkDeleteIds] = useState<string[]>([]);
+  const hasActiveFilters = !!(
+    queryParams.search ||
+    queryParams.artist ||
+    queryParams.genre
+  );
+  const resetFilters = () => updateQueryParams({ ...TRACK_QUERY_DEFAULTS });
+
+  const retryAll = () => {
+    tracksQuery.refetch();
+    artistsQuery.refetch();
+    genresQuery.refetch();
+  };
+
+  const tableData = tracksQuery.data?.data ?? [];
 
   const handleCreate = async (form: TrackFormData) => {
-    const res = await trackService.create(form);
-
-    res.match(
-      async () => {
-        showToastMessage("success", "Track created successfully");
-        await Promise.all([refetchTracks(), artists.refetch()]);
-      },
-      (e) => showToastMessage("error", extractErrorMessage(e))
-    );
-
-    setIsCreating(false);
+    await createTrackMutation.mutateAsync(form);
+    closeModal();
   };
 
   const handleUpdate = async (form: TrackFormData) => {
-    if (!editingTrack) return;
+    if (!modalTrack) return;
 
-    const fields: (keyof TrackFormData)[] = [
-      "title",
-      "artist",
-      "genres",
-      "album",
-      "coverImage",
-    ];
-    if (fields.every((k) => editingTrack[k] === form[k])) {
-      setEditingTrack(null);
+    const hasChanges = (
+      ["title", "artist", "genres", "album", "coverImage"] as const
+    ).some(
+      (key) => JSON.stringify(modalTrack[key]) !== JSON.stringify(form[key])
+    );
+
+    if (!hasChanges) {
+      closeModal();
       return;
     }
 
-    const res = await trackService.update(editingTrack.id, form);
-    res.match(
-      async () => {
-        showToastMessage("success", "Track updated successfully");
-        await Promise.all([refetchTracks(), artists.refetch()]);
-      },
-      (e) => showToastMessage("error", extractErrorMessage(e))
-    );
-    setEditingTrack(null);
+    await updateTrackMutation.mutateAsync({ id: modalTrack.id, data: form });
+    closeModal();
   };
 
-  const confirmDelete = async () => {
-    if (!deletingTrack) return;
-
-    const res = await trackService.delete(deletingTrack.id);
-    res.match(
-      async () => {
-        showToastMessage("success", "Track deleted successfully");
-        await Promise.all([refetchTracks(), artists.refetch()]);
-      },
-      (e) => showToastMessage("error", extractErrorMessage(e))
-    );
-
-    setDeletingTrack(null);
+  const handleDelete = async () => {
+    if (!modalTrack) return;
+    await deleteTrackMutation.mutateAsync(modalTrack.id);
+    closeModal();
   };
 
-  const confirmUpload = async (file: File) => {
-    if (!uploadingTrack) return;
-
-    const res = await trackService.uploadTrackFile(uploadingTrack.id, file);
-    res.match(
-      async () => {
-        showToastMessage("success", "File uploaded");
-        await refetchTracks();
-      },
-      (e) => showToastMessage("error", extractErrorMessage(e))
-    );
-
-    setUploadingTrack(null);
+  const handleUpload = async (file: File) => {
+    if (!modalTrack) return;
+    await uploadFileMutation.mutateAsync({ id: modalTrack.id, file });
+    closeModal();
   };
 
-  const confirmDeleteFile = async () => {
-    if (!deletingFileTrack) return;
-
-    const res = await trackService.deleteTrackFile(deletingFileTrack.id);
-    res.match(
-      async () => {
-        showToastMessage("success", "File removed");
-        await Promise.all([refetchTracks(), artists.refetch()]);
-      },
-      (e) => showToastMessage("error", extractErrorMessage(e))
-    );
-
-    setDeletingFile(null);
+  const handleDeleteFile = async () => {
+    if (!modalTrack) return;
+    await deleteFileMutation.mutateAsync(modalTrack.id);
+    closeModal();
   };
 
-  const handleBulkDelete = async (ids: string[]) => {
-    const res = await trackService.deleteMultipleTracks(ids);
-    res.match(
-      async ({ success, failed }) => {
-        showToastMessage(
-          "success",
-          `Deleted ${success.length} track${success.length === 1 ? "" : "s"}`
-        );
-        if (failed.length)
-          showToastMessage("error", `Failed to delete: ${failed.join(", ")}`);
-        await Promise.all([refetchTracks(), artists.refetch()]);
-      },
-      (e) => showToastMessage("error", extractErrorMessage(e))
-    );
+  const handleBulkDelete = async () => {
+    if (bulkDeleteIds.length === 0) return;
+    await bulkDeleteMutation.mutateAsync(bulkDeleteIds);
+    closeModal();
+  };
 
-    setBulkDeleteIds([]);
+  if (isPending) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <LoadingSpinner size="lg" />
+      </div>
+    );
+  }
+
+  if (tracksQuery.isError) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <ErrorMessage
+          message={extractErrorMessage(tracksQuery.error)}
+          onRetry={retryAll}
+        />
+      </div>
+    );
+  }
+
+  const meta = tracksQuery.data?.meta ?? {
+    total: 0,
+    page: 1,
+    limit: 10,
+    totalPages: 1,
   };
 
   return (
@@ -160,7 +159,7 @@ const TracksPage: React.FC = () => {
           <h1 className="text-3xl font-bold">Tracks</h1>
           <button
             className="btn btn-primary"
-            onClick={() => setIsCreating(true)}
+            onClick={openCreate}
             data-testid="create-track-button"
           >
             New Track
@@ -168,83 +167,102 @@ const TracksPage: React.FC = () => {
         </div>
 
         <TrackToolbar
-          artists={artists}
-          genres={genres}
-          filterArtist={filterArtist ?? ""}
-          setFilterArtist={(v) => patch({ artist: v, page: 1 })}
-          filterGenre={filterGenre ?? ""}
-          setFilterGenre={(v) => patch({ genre: v, page: 1 })}
-          search={search ?? ""}
-          setSearch={(v) => patch({ search: v, page: 1 })}
+          artists={toRefreshableResourceState(artistsQuery)}
+          genres={toResourceState(genresQuery)}
+          filterArtist={queryParams.artist}
+          setFilterArtist={(v) => updateQueryParams({ artist: v, page: 1 })}
+          filterGenre={queryParams.genre}
+          setFilterGenre={(v) => updateQueryParams({ genre: v, page: 1 })}
+          search={queryParams.search}
+          setSearch={(v) => updateQueryParams({ search: v, page: 1 })}
         />
 
-        <TrackTable
-          data={memoData}
-          sort={sort}
-          order={order}
-          page={page}
-          totalPages={totalPages}
-          limit={limit}
-          patch={patch}
-          onEdit={setEditingTrack}
-          onDelete={setDeletingTrack}
-          onUploadClick={setUploadingTrack}
-          onDeleteFile={setDeletingFile}
-          onBulkDelete={setBulkDeleteIds}
-        />
+        {tableData.length === 0 ? (
+          <div className="text-center py-12">
+            <p className="text-gray-500 text-lg mb-4">
+              {hasActiveFilters
+                ? "No tracks found matching your criteria"
+                : "No tracks available"}
+            </p>
+            {hasActiveFilters && (
+              <button
+                className="btn btn-outline btn-sm"
+                onClick={resetFilters}
+                data-testid="reset-filters-button"
+              >
+                Reset Filters
+              </button>
+            )}
+          </div>
+        ) : (
+          <TrackTable
+            data={tableData}
+            sort={queryParams.sort}
+            order={queryParams.order}
+            page={queryParams.page}
+            totalPages={meta.totalPages}
+            limit={queryParams.limit}
+            patch={updateQueryParams}
+            onEdit={openEdit}
+            onDelete={openDelete}
+            onUploadClick={openUpload}
+            onDeleteFile={openDeleteFile}
+            onBulkDelete={openBulkDelete}
+          />
+        )}
 
-        {isCreating && (
-          <Modal onClose={() => setIsCreating(false)}>
+        {modalType === "create" && (
+          <Modal onClose={closeModal}>
             <TrackForm
               onSubmit={handleCreate}
-              genres={genres}
-              onCancel={() => setIsCreating(false)}
+              genres={toResourceState(genresQuery)}
+              onCancel={closeModal}
             />
           </Modal>
         )}
 
-        {editingTrack && (
-          <Modal onClose={() => setEditingTrack(null)}>
+        {modalType === "edit" && modalTrack && (
+          <Modal onClose={closeModal}>
             <TrackForm
-              initialData={editingTrack}
-              genres={genres}
+              initialData={modalTrack}
+              genres={toResourceState(genresQuery)}
               onSubmit={handleUpdate}
-              onCancel={() => setEditingTrack(null)}
+              onCancel={closeModal}
             />
           </Modal>
         )}
 
-        {deletingTrack && (
+        {modalType === "delete" && modalTrack && (
           <DeleteConfirmationModal
-            title={`Delete "${deletingTrack.title}"?`}
-            onConfirm={confirmDelete}
-            onCancel={() => setDeletingTrack(null)}
+            title={`Delete "${modalTrack.title}"?`}
+            onConfirm={handleDelete}
+            onCancel={closeModal}
           />
         )}
 
-        {uploadingTrack && (
+        {modalType === "upload" && modalTrack && (
           <UploadFileModal
-            track={uploadingTrack}
-            onUpload={confirmUpload}
-            onCancel={() => setUploadingTrack(null)}
+            track={modalTrack}
+            onUpload={handleUpload}
+            onCancel={closeModal}
           />
         )}
 
-        {deletingFileTrack && (
+        {modalType === "deleteFile" && modalTrack && (
           <DeleteConfirmationModal
-            title={`Remove audio from “${deletingFileTrack.title}”?`}
-            onConfirm={confirmDeleteFile}
-            onCancel={() => setDeletingFile(null)}
+            title={`Remove audio from "${modalTrack.title}"?`}
+            onConfirm={handleDeleteFile}
+            onCancel={closeModal}
           />
         )}
 
-        {bulkDeleteIds.length > 0 && (
+        {modalType === "bulkDelete" && bulkDeleteIds.length > 0 && (
           <DeleteConfirmationModal
             title={`Delete ${bulkDeleteIds.length} track${
               bulkDeleteIds.length > 1 ? "s" : ""
             }?`}
-            onConfirm={() => handleBulkDelete(bulkDeleteIds)}
-            onCancel={() => setBulkDeleteIds([])}
+            onConfirm={handleBulkDelete}
+            onCancel={closeModal}
           />
         )}
       </div>
