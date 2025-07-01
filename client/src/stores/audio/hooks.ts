@@ -11,14 +11,22 @@ export const useAudioTrack = () => {
       const isSameTrack = store.currentTrack?.id === track.id;
 
       if (isSameTrack) {
-        store.isPlaying ? store.pause() : store.resume();
+        if (store.isPlaying) {
+          store.pause();
+        } else {
+          store.resume();
+        }
       } else {
         store.play(track);
       }
       return;
     }
 
-    store.isPlaying ? store.pause() : store.resume();
+    if (store.isPlaying) {
+      store.pause();
+    } else {
+      store.resume();
+    }
   };
 
   const isCurrentTrack = (trackId: string) => {
