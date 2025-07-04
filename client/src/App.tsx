@@ -3,7 +3,7 @@ import { ToastContainer } from "react-toastify";
 import { Suspense, lazy } from "react";
 import { useTheme } from "@/hooks";
 import { Footer, Header } from "@/components";
-import TracksPage from "./pages/TracksPage";
+import TracksPage from "@/pages/TracksPage";
 import "react-toastify/dist/ReactToastify.css";
 
 const AudioPlayer = lazy(() =>
