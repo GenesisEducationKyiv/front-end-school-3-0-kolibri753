@@ -1,13 +1,14 @@
 import type { Result } from "neverthrow";
-import { BaseService } from "./baseService";
-import type { IHttpClient } from "./httpClient";
-import type { AppError } from "./errors";
 import type { Track, Paginated } from "@/types";
 import {
   trackQuerySchema,
   type TrackFormData,
   type TrackQueryInput,
 } from "@/schemas";
+import { env } from "@/config";
+import { BaseService } from "./baseService";
+import type { IHttpClient } from "./httpClient";
+import type { AppError } from "./errors";
 
 /**
  * TrackService — thin wrapper over /api/tracks endpoints.
@@ -23,7 +24,9 @@ export class TrackService extends BaseService<Track, TrackFormData> {
    * GET /api/tracks/:slug
    */
   getBySlug(slug: string): Promise<Result<Track, AppError>> {
-    return this.http.get<Track>(`/api/${TrackService.resource}/${slug}`);
+    return this.http.get<Track>(
+      `${env.API_PREFIX}/${TrackService.resource}/${slug}`
+    );
   }
 
   /**
@@ -34,10 +37,13 @@ export class TrackService extends BaseService<Track, TrackFormData> {
     signal?: AbortSignal
   ): Promise<Result<Paginated<Track>, AppError>> {
     const params = trackQuerySchema.parse(opts);
-    return this.http.get<Paginated<Track>>(`/api/${TrackService.resource}`, {
-      params,
-      signal,
-    });
+    return this.http.get<Paginated<Track>>(
+      `${env.API_PREFIX}/${TrackService.resource}`,
+      {
+        params,
+        signal,
+      }
+    );
   }
 
   /**
@@ -47,7 +53,7 @@ export class TrackService extends BaseService<Track, TrackFormData> {
     const form = new FormData();
     form.append("file", file);
     return this.http.post<Track>(
-      `/api/${TrackService.resource}/${id}/upload`,
+      `${env.API_PREFIX}/${TrackService.resource}/${id}/upload`,
       form,
       {
         headers: { "Content-Type": "multipart/form-data" },
@@ -60,7 +66,7 @@ export class TrackService extends BaseService<Track, TrackFormData> {
    */
   async deleteTrackFile(id: string): Promise<Result<Track, AppError>> {
     const res = await this.http.delete<Track>(
-      `/api/${TrackService.resource}/${id}/file`
+      `${env.API_PREFIX}/${TrackService.resource}/${id}/file`
     );
     if (res.isErr() && res.error.type === "NotFound") {
       return this.getById(id);
@@ -75,7 +81,7 @@ export class TrackService extends BaseService<Track, TrackFormData> {
     ids: string[]
   ): Promise<Result<{ success: string[]; failed: string[] }, AppError>> {
     return this.http.post<{ success: string[]; failed: string[] }>(
-      `/api/${TrackService.resource}/delete`,
+      `${env.API_PREFIX}/${TrackService.resource}/delete`,
       { ids }
     );
   }
