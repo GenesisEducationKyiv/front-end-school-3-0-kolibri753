@@ -7,7 +7,7 @@ import TracksPage from "@/pages/TracksPage";
 import "react-toastify/dist/ReactToastify.css";
 
 const AudioPlayer = lazy(() =>
-  import("@/features/AudioPlayer").then((module) => ({
+  import("@/features").then((module) => ({
     default: module.AudioPlayer,
   }))
 );
