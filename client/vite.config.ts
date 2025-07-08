@@ -10,8 +10,6 @@ export default defineConfig(({ mode }) => {
   const isDev = mode === "development";
   const isAnalyze = mode === "analyze";
 
-  const shouldAnalyze = isAnalyze;
-
   return {
     plugins: [
       react(),
@@ -19,7 +17,7 @@ export default defineConfig(({ mode }) => {
       svgr(),
       tsconfigPaths(),
 
-      ...(shouldAnalyze
+      ...(isAnalyze
         ? [
             visualizer({
               filename: "dist/bundle-analysis-treemap.html",
@@ -48,6 +46,11 @@ export default defineConfig(({ mode }) => {
           ]
         : []),
     ],
+
+    esbuild: {
+      jsxDev: isDev,
+      drop: isDev ? [] : ["console", "debugger"],
+    },
 
     build: {
       sourcemap: isDev ? "inline" : true,
@@ -110,15 +113,15 @@ export default defineConfig(({ mode }) => {
             }
           },
 
-          chunkFileNames: !isDev
-            ? "assets/js/[name]-[hash].js"
-            : "assets/js/[name].js",
-          assetFileNames: !isDev
-            ? "assets/[ext]/[name]-[hash].[ext]"
-            : "assets/[ext]/[name].[ext]",
-          entryFileNames: !isDev
-            ? "assets/js/[name]-[hash].js"
-            : "assets/js/[name].js",
+          chunkFileNames: isDev
+            ? "assets/js/[name].js"
+            : "assets/js/[name]-[hash].js",
+          assetFileNames: isDev
+            ? "assets/[ext]/[name].[ext]"
+            : "assets/[ext]/[name]-[hash].[ext]",
+          entryFileNames: isDev
+            ? "assets/js/[name].js"
+            : "assets/js/[name]-[hash].js",
         },
 
         treeshake: {
@@ -136,13 +139,6 @@ export default defineConfig(({ mode }) => {
           env.VITE_API_BASE_URL || "http://localhost:8000",
       },
     },
-
-    ...(isDev && {
-      esbuild: {
-        jsxDev: true,
-        drop: !isDev ? ["console", "debugger"] : [],
-      },
-    }),
 
     optimizeDeps: {
       include: [
