@@ -11,6 +11,10 @@ import {
 } from "./controllers/tracks.controller";
 import { getAllArtists } from "./controllers/artists.controller";
 import { getAllGenres } from "./controllers/genres.controller";
+import {
+  handleNowPlayingWebSocket,
+  getCurrentNowPlaying,
+} from "./controllers/now-playing.controller";
 
 export default async function routes(fastify: FastifyInstance) {
   // Define schemas for routes
@@ -57,6 +61,41 @@ export default async function routes(fastify: FastifyInstance) {
     handler: async (request, reply) => {
       return reply.code(200).send({ status: "ok" });
     },
+  });
+
+  // Now-playing WebSocket endpoint
+  fastify.register(async function (fastify) {
+    fastify.get(
+      "/api/ws/now-playing",
+      {
+        websocket: true,
+        schema: {
+          description: "WebSocket endpoint for live now-playing updates",
+          tags: ["now-playing"],
+        },
+      },
+      handleNowPlayingWebSocket
+    );
+  });
+
+  // Now-playing HTTP endpoint
+  fastify.get("/api/now-playing", {
+    schema: {
+      description: "Get current now-playing track info",
+      tags: ["now-playing"],
+      response: {
+        200: {
+          type: "object",
+          properties: {
+            currentTrack: { type: "string" },
+            clientCount: { type: "number" },
+            timestamp: { type: "number" },
+          },
+        },
+        500: errorSchema,
+      },
+    },
+    handler: getCurrentNowPlaying,
   });
 
   // Genres
