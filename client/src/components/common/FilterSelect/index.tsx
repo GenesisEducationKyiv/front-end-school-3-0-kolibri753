@@ -1,21 +1,16 @@
-import React, { useEffect } from "react";
-
-type NativeProps = Omit<
-  React.SelectHTMLAttributes<HTMLSelectElement>,
-  "value" | "onChange"
->;
-
-interface FilterSelectProps extends NativeProps {
+interface FilterSelectProps {
   label: string;
   options: string[];
   value: string;
-  onChange(v: string): void;
+  onChange: (value: string) => void;
   loading?: boolean;
   error?: boolean;
   dataTestId?: string;
+  id?: string;
+  name?: string;
 }
 
-export const FilterSelect: React.FC<FilterSelectProps> = ({
+export const FilterSelect = ({
   label,
   options,
   value,
@@ -23,31 +18,26 @@ export const FilterSelect: React.FC<FilterSelectProps> = ({
   loading = false,
   error = false,
   dataTestId,
-  ...nativeProps
-}) => {
-  useEffect(() => {
-    if (
-      value &&
-      !loading &&
-      !error &&
-      options.length > 0 &&
-      !options.includes(value)
-    ) {
-      onChange("");
-    }
-  }, [value, options, loading, error, onChange]);
+  id,
+  name,
+}: FilterSelectProps) => {
+  const safeValue = options.includes(value) ? value : "";
+
+  const defaultId = id || `filter-${label.toLowerCase().replace(/\s+/g, "-")}`;
+  const defaultName =
+    name || `filter_${label.toLowerCase().replace(/\s+/g, "_")}`;
 
   return (
-    <div className="form-control w-full sm:w-auto">
-      <label className="label">
+    <label className="form-control w-full sm:w-auto" htmlFor={defaultId}>
+      <div className="label">
         <span className="label-text">{label}</span>
-      </label>
-
+      </div>
       <select
-        {...nativeProps}
+        id={defaultId}
+        name={defaultName}
         data-testid={dataTestId}
         className="select select-bordered select-sm min-w-[8rem]"
-        value={options.includes(value) ? value : ""}
+        value={safeValue}
         disabled={loading || error}
         onChange={(e) => onChange(e.target.value)}
       >
@@ -56,14 +46,14 @@ export const FilterSelect: React.FC<FilterSelectProps> = ({
         {!loading && !error && (
           <>
             <option value="">All {label.toLowerCase()}</option>
-            {options.map((opt) => (
-              <option key={opt} value={opt}>
-                {opt}
+            {options.map((option) => (
+              <option key={option} value={option}>
+                {option}
               </option>
             ))}
           </>
         )}
       </select>
-    </div>
+    </label>
   );
 };

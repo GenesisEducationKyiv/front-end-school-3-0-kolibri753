@@ -38,13 +38,13 @@ export function TrackPlayer({
         {isPlaying ? <Pause size={16} /> : <Play size={16} />}
       </button>
 
-      {showRemove && onRemove && (
+      {showRemove && (
         <button
           type="button"
           className="btn btn-xs btn-circle btn-error btn-ghost"
           onClick={onRemove}
           data-testid={`delete-track-audio-${track.id}`}
-          aria-label="Remove audio"
+          aria-label={`Remove audio from ${track.title}`}
         >
           <X size={12} />
         </button>

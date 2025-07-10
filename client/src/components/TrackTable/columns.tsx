@@ -1,8 +1,7 @@
 import { type ColumnDef } from "@tanstack/react-table";
-import BackupCoverUrl from "@/assets/logo.svg";
 import { Edit2, Trash2 } from "lucide-react";
 import type { Track } from "@/types";
-import { TrackPlayer } from "@/components";
+import { TrackPlayer, OptimizedImage } from "@/components";
 
 export interface TableMeta {
   selectionMode: boolean;
@@ -26,6 +25,7 @@ export const columns: ColumnDef<Track, unknown>[] = [
           checked={table.getIsAllRowsSelected()}
           onChange={table.getToggleAllRowsSelectedHandler()}
           data-testid="select-all"
+          aria-label="Select all tracks"
         />
       ) : null;
     },
@@ -38,6 +38,7 @@ export const columns: ColumnDef<Track, unknown>[] = [
           checked={row.getIsSelected()}
           onChange={row.getToggleSelectedHandler()}
           data-testid={`track-checkbox-${row.original.id}`}
+          aria-label={`Select ${row.original.title}`}
         />
       ) : null;
     },
@@ -48,12 +49,15 @@ export const columns: ColumnDef<Track, unknown>[] = [
     header: "Cover",
     enableSorting: false,
     size: 80,
-    cell: ({ getValue }) => {
-      const url = getValue<string>() || BackupCoverUrl;
-      return (
-        <img src={url} alt="cover" className="w-12 h-12 object-cover rounded" />
-      );
-    },
+    cell: ({ getValue, row }) => (
+      <OptimizedImage
+        src={getValue<string>()}
+        alt={`Cover art for ${row.original.title} by ${row.original.artist}`}
+        width={48}
+        height={48}
+        className="object-cover rounded"
+      />
+    ),
   },
 
   {
@@ -152,6 +156,8 @@ export const columns: ColumnDef<Track, unknown>[] = [
             className="btn btn-xs btn-ghost"
             onClick={() => onEdit(track)}
             data-testid={`edit-track-${track.id}`}
+            aria-label={`Edit ${track.title}`}
+            title={`Edit ${track.title}`}
           >
             <Edit2 size={14} />
           </button>
@@ -159,6 +165,8 @@ export const columns: ColumnDef<Track, unknown>[] = [
             className="btn btn-xs btn-error btn-outline"
             onClick={() => onDelete(track)}
             data-testid={`delete-track-${track.id}`}
+            aria-label={`Delete ${track.title}`}
+            title={`Delete ${track.title}`}
           >
             <Trash2 size={14} />
           </button>

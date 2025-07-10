@@ -1,22 +1,18 @@
-import React from "react";
 import { FilterSelect, SearchInput } from "@/components";
 import type { ResourceState } from "@/types";
 
 export interface TrackToolbarProps {
   artists: ResourceState<string>;
   genres: ResourceState<string>;
-
   filterArtist: string;
-  setFilterArtist(v: string): void;
-
+  setFilterArtist: (v: string) => void;
   filterGenre: string;
-  setFilterGenre(v: string): void;
-
+  setFilterGenre: (v: string) => void;
   search: string;
-  setSearch(v: string): void;
+  setSearch: (v: string) => void;
 }
 
-export const TrackToolbar: React.FC<TrackToolbarProps> = ({
+export const TrackToolbar = ({
   artists,
   genres,
   filterArtist,
@@ -25,13 +21,15 @@ export const TrackToolbar: React.FC<TrackToolbarProps> = ({
   setFilterGenre,
   search,
   setSearch,
-}) => (
+}: TrackToolbarProps) => (
   <div className="flex items-center justify-between flex-wrap mb-4">
     <SearchInput
       value={search}
       onChange={setSearch}
       placeholder="Search tracks…"
       dataTestId="search-input"
+      id="main-search"
+      name="main-search-input"
     />
 
     <div className="flex gap-4">

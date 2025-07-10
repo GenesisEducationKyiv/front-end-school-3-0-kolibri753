@@ -15,12 +15,11 @@ export const SelectModeToggle: React.FC<SelectModeToggleProps> = ({
   onBulkDelete,
   bulkDeleteDisabled,
 }) => (
-  <div
-    role="toolbar"
-    aria-label="Selection mode controls"
-    className="flex items-center space-x-2 ml-auto"
-  >
+  <div role="toolbar" className="flex items-center space-x-2 ml-auto">
     <button
+      aria-label={
+        selectionMode ? "Exit selection mode" : "Enter multi-select mode"
+      }
       aria-pressed={selectionMode}
       onClick={onToggleMode}
       className="btn btn-primary btn-sm"

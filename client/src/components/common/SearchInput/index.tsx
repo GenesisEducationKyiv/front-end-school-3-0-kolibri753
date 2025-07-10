@@ -1,50 +1,40 @@
-import React, {
-  useState,
-  useEffect,
-  useRef,
-  type InputHTMLAttributes,
-} from "react";
+import { useState, useEffect } from "react";
 import { Search } from "lucide-react";
 
-type NativeInputProps = Omit<
-  InputHTMLAttributes<HTMLInputElement>,
-  "onChange" | "value"
->;
-
-interface SearchInputProps extends NativeInputProps {
+interface SearchInputProps {
   value: string;
-  onChange(value: string): void;
+  onChange: (value: string) => void;
   placeholder?: string;
   dataTestId?: string;
   debounce?: number;
+  id?: string;
+  name?: string;
 }
 
-export const SearchInput: React.FC<SearchInputProps> = ({
-  value: initialValue,
+export const SearchInput = ({
+  value,
   onChange,
   placeholder = "Search...",
   dataTestId,
   debounce = 300,
-  ...nativeProps
-}) => {
-  const [value, setValue] = useState(initialValue);
+  id = "search-input",
+  name = "search",
+}: SearchInputProps) => {
+  const [internalValue, setInternalValue] = useState(value);
 
   useEffect(() => {
-    setValue(initialValue);
-  }, [initialValue]);
-
-  const didMountRef = useRef(false);
+    setInternalValue(value);
+  }, [value]);
 
   useEffect(() => {
-    if (!didMountRef.current) {
-      didMountRef.current = true;
-      return;
-    }
-    if (value === initialValue) return;
+    const handler = setTimeout(() => {
+      if (internalValue !== value) {
+        onChange(internalValue);
+      }
+    }, debounce);
 
-    const handler = setTimeout(() => onChange(value), debounce);
     return () => clearTimeout(handler);
-  }, [value, initialValue, debounce, onChange]);
+  }, [internalValue, value, onChange, debounce]);
 
   return (
     <fieldset className="fieldset w-full sm:w-auto">
@@ -53,12 +43,13 @@ export const SearchInput: React.FC<SearchInputProps> = ({
         <Search className="absolute left-2 top-1/2 -translate-y-1/2 opacity-50 h-3 w-3" />
         <input
           type="search"
-          {...nativeProps}
+          id={id}
+          name={name}
           data-testid={dataTestId}
           placeholder={placeholder}
           className="w-full pl-4 bg-transparent focus:outline-none"
-          value={value}
-          onChange={(e) => setValue(e.target.value)}
+          value={internalValue}
+          onChange={(e) => setInternalValue(e.target.value)}
         />
       </label>
     </fieldset>
