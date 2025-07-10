@@ -5,20 +5,19 @@ export const useAudioTrack = () => {
   const store = useAudioStore();
 
   const togglePlay = (track?: AudioTrack) => {
-    if (!track && !store.currentTrack) return;
+    const targetTrack = track ?? store.currentTrack;
 
-    if (track) {
-      const isSameTrack = store.currentTrack?.id === track.id;
+    if (!targetTrack) return;
 
-      if (isSameTrack) {
-        store.isPlaying ? store.pause() : store.resume();
-      } else {
-        store.play(track);
-      }
-      return;
+    const isSameTrack = store.currentTrack?.id === targetTrack.id;
+
+    if (isSameTrack && store.isPlaying) {
+      store.pause();
+    } else if (isSameTrack && !store.isPlaying) {
+      store.resume();
+    } else {
+      store.play(targetTrack);
     }
-
-    store.isPlaying ? store.pause() : store.resume();
   };
 
   const isCurrentTrack = (trackId: string) => {
