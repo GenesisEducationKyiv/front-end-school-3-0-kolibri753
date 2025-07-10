@@ -1,10 +1,16 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
+import { Suspense, lazy } from "react";
 import { useTheme } from "@/hooks";
 import { Footer, Header } from "@/components";
-import { AudioPlayer } from "@/features";
 import TracksPage from "@/pages/TracksPage";
 import "react-toastify/dist/ReactToastify.css";
+
+const AudioPlayer = lazy(() =>
+  import("@/features").then((module) => ({
+    default: module.AudioPlayer,
+  }))
+);
 
 function App() {
   const { theme } = useTheme();
@@ -19,7 +25,9 @@ function App() {
       </Routes>
       <Footer />
 
-      <AudioPlayer />
+      <Suspense fallback={null}>
+        <AudioPlayer />
+      </Suspense>
 
       <ToastContainer
         data-testid="toast-container"

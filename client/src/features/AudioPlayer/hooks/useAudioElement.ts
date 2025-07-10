@@ -4,7 +4,7 @@ import { useAudioTrack, useAudioProgress } from "@/stores";
 export const useAudioElement = () => {
   const audioRef = useRef<HTMLAudioElement>(null);
   const [error, setError] = useState(false);
-  const { currentTrack, isPlaying } = useAudioTrack();
+  const { currentTrack, isPlaying, pause } = useAudioTrack();
   const { setCurrentTime, setDuration } = useAudioProgress();
 
   // Handle the main audio element (for actual playback)
@@ -25,11 +25,18 @@ export const useAudioElement = () => {
       setCurrentTime(0);
       setDuration(0);
     };
+    const handleEnded = () => {
+      if (audioEl) {
+        audioEl.currentTime = 0;
+      }
+      pause();
+    };
 
     audioEl.addEventListener("error", handleError);
     audioEl.addEventListener("loadedmetadata", handleLoadedMetadata);
     audioEl.addEventListener("timeupdate", handleTimeUpdate);
     audioEl.addEventListener("loadstart", handleLoadStart);
+    audioEl.addEventListener("ended", handleEnded);
 
     // Set source and load
     audioEl.src = currentTrack.src;
@@ -40,6 +47,7 @@ export const useAudioElement = () => {
       audioEl.removeEventListener("loadedmetadata", handleLoadedMetadata);
       audioEl.removeEventListener("timeupdate", handleTimeUpdate);
       audioEl.removeEventListener("loadstart", handleLoadStart);
+      audioEl.removeEventListener("ended", handleEnded);
     };
   }, [
     currentTrack,
@@ -47,6 +55,7 @@ export const useAudioElement = () => {
     currentTrack?.id,
     setCurrentTime,
     setDuration,
+    pause,
   ]);
 
   // Handle play/pause for main audio
