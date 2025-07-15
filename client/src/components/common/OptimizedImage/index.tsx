@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useCallback } from "react";
 import { BACKUP_PLACEHOLDER, getOptimizedUrl } from "@/lib";
 
 type OptimizedImageProps = {
@@ -18,18 +18,19 @@ export const OptimizedImage = ({
 }: OptimizedImageProps) => {
   const [hasError, setHasError] = useState(false);
 
-  const memoizedSrc = useMemo(() => {
-    return getOptimizedUrl(src, width, height);
-  }, [src, width, height]);
+  const optimizedSrc = useMemo(
+    () => (hasError ? BACKUP_PLACEHOLDER : getOptimizedUrl(src, width, height)),
+    [src, width, height, hasError]
+  );
 
-  const handleError = () => {
-    setHasError(true);
-  };
+  const handleError = useCallback(() => setHasError(true), []);
+
+  const imageKey = src?.trim() || "no-src";
 
   return (
     <img
-      key={src}
-      src={hasError ? BACKUP_PLACEHOLDER : memoizedSrc}
+      key={imageKey}
+      src={optimizedSrc}
       alt={alt}
       width={width}
       height={height}

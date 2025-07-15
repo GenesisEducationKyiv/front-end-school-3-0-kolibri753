@@ -16,12 +16,12 @@ export const getOptimizedUrl = (
   width: number,
   height: number
 ): string => {
-  if (!src) {
+  if (!src?.trim()) {
     return BACKUP_PLACEHOLDER;
   }
 
   try {
-    const url = new URL(src);
+    const url = new URL(src.trim());
     const cleanUrl = url.hostname + url.pathname + url.search;
 
     const requestWidth = width * 2;
