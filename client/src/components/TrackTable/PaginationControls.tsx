@@ -1,18 +1,16 @@
-import React from "react";
-
-interface Props {
+interface PaginationControlsProps {
   page: number;
   totalPages: number;
   limit: number;
-  patch(q: Record<string, string | number | undefined>): void;
+  patch: (q: Record<string, string | number | undefined>) => void;
 }
 
-export const PaginationControls: React.FC<Props> = ({
+export const PaginationControls = ({
   page,
   totalPages,
   limit,
   patch,
-}) => (
+}: PaginationControlsProps) => (
   <div
     className="flex items-center justify-end flex-wrap gap-4 mt-4"
     data-testid="pagination"
@@ -39,16 +37,21 @@ export const PaginationControls: React.FC<Props> = ({
       Next →
     </button>
 
-    <select
-      className="select select-bordered select-sm"
-      value={limit}
-      onChange={(e) => patch({ limit: Number(e.target.value), page: 1 })}
-    >
-      {[5, 10, 20].map((n) => (
-        <option key={n} value={n}>
-          {n} / page
-        </option>
-      ))}
-    </select>
+    <label className="flex items-center gap-2">
+      <span className="text-sm">Per page:</span>
+      <select
+        className="select select-bordered select-sm"
+        value={limit}
+        onChange={(e) => patch({ limit: Number(e.target.value), page: 1 })}
+        id="per-page-select"
+        name="limit"
+      >
+        {[5, 10, 20].map((n) => (
+          <option key={n} value={n}>
+            {n}
+          </option>
+        ))}
+      </select>
+    </label>
   </div>
 );
