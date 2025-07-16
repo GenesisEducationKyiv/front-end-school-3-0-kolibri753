@@ -24,7 +24,6 @@
     "@tanstack/react-query-devtools": "^5.81.2",
     "@tanstack/react-table": "^8.21.3",
     "axios": "^1.8.4",
-    "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "eslint-plugin-neverthrow": "^1.1.4",
     "lucide-react": "^0.493.0",
