@@ -5,3 +5,4 @@ export { TagSelector } from "./TagSelector";
 export { SelectModeToggle } from "./SelectModeToggle";
 export { LoadingSpinner } from "./LoadingSpinner";
 export { ErrorMessage } from "./ErrorMessage";
+export { OptimizedImage } from "./OptimizedImage";

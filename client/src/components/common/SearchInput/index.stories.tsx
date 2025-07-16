@@ -26,10 +26,3 @@ const SearchInputWrapper = (args: React.ComponentProps<typeof SearchInput>) => {
 export const Default: Story = {
   render: SearchInputWrapper,
 };
-
-export const Disabled: Story = {
-  args: {
-    disabled: true,
-  },
-  render: SearchInputWrapper,
-};

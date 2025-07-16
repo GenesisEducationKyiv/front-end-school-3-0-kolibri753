@@ -13,5 +13,6 @@ export {
   SelectModeToggle,
   LoadingSpinner,
   ErrorMessage,
+  OptimizedImage,
 } from "./common";
 export { Header, Footer } from "./layout";
