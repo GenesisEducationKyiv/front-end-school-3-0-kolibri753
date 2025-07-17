@@ -3,6 +3,7 @@ import { mockTracks } from "../fixtures/track-data";
 
 test.describe("Tracks Page Smoke Tests", () => {
   test.beforeEach(async ({ apiMock }) => {
+    await apiMock.mockWebSocket();
     await apiMock.mockTracksApi();
     await apiMock.mockArtistsAndGenres();
   });
