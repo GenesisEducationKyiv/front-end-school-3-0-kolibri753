@@ -6,7 +6,7 @@ export function Footer() {
     <footer className="footer footer-center bg-neutral text-neutral-content p-6">
       <div>
         <p className="font-semibold">
-          © 2025 HummingTrack – Let the music take flight
+          © 2025 HummingTrack – let the music take flight :)
         </p>
         <p className="text-sm opacity-70">
           Built for Genesis Front-End School 3.0

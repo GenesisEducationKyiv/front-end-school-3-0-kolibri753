@@ -128,7 +128,7 @@ const TracksPage: React.FC = () => {
 
   if (isPending) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="flex-1 flex items-center justify-center">
         <LoadingSpinner size="lg" />
       </div>
     );
@@ -136,7 +136,7 @@ const TracksPage: React.FC = () => {
 
   if (tracksQuery.isError) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="flex-1 flex items-center justify-center">
         <ErrorMessage
           message={extractErrorMessage(tracksQuery.error)}
           onRetry={retryAll}
@@ -153,8 +153,8 @@ const TracksPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen">
-      <div className="container mx-auto px-4 py-6">
+    <div className="flex-1 flex flex-col">
+      <div className="container mx-auto px-4 py-6 flex-1 flex flex-col">
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-3xl font-bold">Tracks</h1>
           <button
@@ -178,7 +178,7 @@ const TracksPage: React.FC = () => {
         />
 
         {tableData.length === 0 ? (
-          <div className="text-center py-12">
+          <div className="text-center">
             <p className="text-gray-500 text-lg mb-4">
               {hasActiveFilters
                 ? "No tracks found matching your criteria"
