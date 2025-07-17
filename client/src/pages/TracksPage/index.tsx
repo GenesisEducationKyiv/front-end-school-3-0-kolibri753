@@ -10,6 +10,7 @@ import {
   useUploadTrackFileMutation,
   useDeleteTrackFileMutation,
   useBulkDeleteTracksMutation,
+  useTrackQueryParams,
 } from "@/hooks";
 import {
   DeleteConfirmationModal,
@@ -22,13 +23,13 @@ import {
   ErrorMessage,
 } from "@/components";
 import type { TrackFormData } from "@/schemas";
-import { useTrackQuery } from "@/lib";
 import { TRACK_QUERY_DEFAULTS } from "@/constants";
 import { extractErrorMessage } from "@/helpers";
 import { toRefreshableResourceState, toResourceState } from "./helpers";
 
 const TracksPage: React.FC = () => {
-  const { query: queryParams, patch: updateQueryParams } = useTrackQuery();
+  const { query: queryParams, patch: updateQueryParams } =
+    useTrackQueryParams();
 
   const {
     modalType,
