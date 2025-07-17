@@ -7,13 +7,12 @@ import {
   SCHEMA_DEFAULT_QUERY,
   type TrackQueryParams,
 } from "@/schemas";
-import { buildSearchParams } from "./urlSearch";
-import { parseSearchParams } from "./parseSearchParams";
+import { buildSearchParams, parseSearchParams } from "@/lib";
 
 /**
  * URL <=> validated query + patcher
  */
-export function useTrackQuery() {
+export function useTrackQueryParams() {
   const [searchParams, setSearchParams] = useSearchParams();
 
   const query = useMemo<TrackQueryParams>(

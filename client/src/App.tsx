@@ -18,12 +18,16 @@ function App() {
 
   return (
     <BrowserRouter>
-      <Header />
-      <Routes>
-        <Route path="/" element={<Navigate to="/tracks" />} />
-        <Route path="/tracks" element={<TracksPage />} />
-      </Routes>
-      <Footer />
+      <div className="min-h-screen flex flex-col">
+        <Header />
+        <main className="flex-1 flex flex-col">
+          <Routes>
+            <Route path="/" element={<Navigate to="/tracks" />} />
+            <Route path="/tracks" element={<TracksPage />} />
+          </Routes>
+        </main>
+        <Footer />
+      </div>
 
       <Suspense fallback={null}>
         <AudioPlayer />

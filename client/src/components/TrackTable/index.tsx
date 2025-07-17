@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   useReactTable,
   getCoreRowModel,
@@ -28,7 +28,7 @@ export interface TrackTableProps {
   onBulkDelete(ids: string[]): void;
 }
 
-export const TrackTable: React.FC<TrackTableProps> = ({
+export const TrackTable = ({
   data,
   sort,
   order,
@@ -41,7 +41,7 @@ export const TrackTable: React.FC<TrackTableProps> = ({
   onUploadClick,
   onDeleteFile,
   onBulkDelete,
-}) => {
+}: TrackTableProps) => {
   const [selectionMode, setSelectionMode] = useState(false);
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
   const selectedIds = useMemo(

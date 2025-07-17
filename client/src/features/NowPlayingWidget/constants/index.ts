@@ -1,8 +1,4 @@
-const getWsUrl = () => {
-  const { protocol, host } = window.location;
-  const wsProtocol = protocol === "https:" ? "wss" : "ws";
-  return `${wsProtocol}://${host}/api/ws/now-playing`;
-};
+import { getWsUrl } from "./getWsUrl";
 
 export const WS_CONFIG = {
   MAX_ATTEMPTS: 5,

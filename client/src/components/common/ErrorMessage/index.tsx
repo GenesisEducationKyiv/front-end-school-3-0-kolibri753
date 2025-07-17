@@ -1,4 +1,3 @@
-import React from "react";
 import { AlertTriangle, RefreshCw } from "lucide-react";
 
 interface ErrorMessageProps {
@@ -6,10 +5,7 @@ interface ErrorMessageProps {
   onRetry?: () => void;
 }
 
-export const ErrorMessage: React.FC<ErrorMessageProps> = ({
-  message,
-  onRetry,
-}) => {
+export const ErrorMessage = ({ message, onRetry }: ErrorMessageProps) => {
   return (
     <div className="alert alert-error max-w-md">
       <AlertTriangle className="h-6 w-6" />
