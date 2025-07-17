@@ -13,7 +13,7 @@ export const SelectModeToggle = ({
   onBulkDelete,
   bulkDeleteDisabled,
 }: SelectModeToggleProps) => (
-  <div role="toolbar" className="flex items-center space-x-2 ml-auto">
+  <div role="toolbar" className="flex items-center">
     <button
       aria-label={
         selectionMode ? "Exit selection mode" : "Enter multi-select mode"
