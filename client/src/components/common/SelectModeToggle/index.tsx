@@ -1,5 +1,3 @@
-import React from "react";
-
 interface SelectModeToggleProps {
   selectionMode: boolean;
   onToggleMode(): void;
@@ -8,13 +6,13 @@ interface SelectModeToggleProps {
   bulkDeleteDisabled: boolean;
 }
 
-export const SelectModeToggle: React.FC<SelectModeToggleProps> = ({
+export const SelectModeToggle = ({
   selectionMode,
   onToggleMode,
   selectedCount,
   onBulkDelete,
   bulkDeleteDisabled,
-}) => (
+}: SelectModeToggleProps) => (
   <div role="toolbar" className="flex items-center space-x-2 ml-auto">
     <button
       aria-label={
