@@ -2,7 +2,70 @@ import type { Page } from "@playwright/test";
 import { mockTracks, mockApiResponses } from "../fixtures/track-data";
 
 export class ApiMockHelper {
-  constructor(private page: Page) {}
+  constructor(private readonly page: Page) {}
+
+  async mockWebSocket(): Promise<void> {
+    await this.page.addInitScript(() => {
+      class MockWebSocket implements WebSocket {
+        static readonly CONNECTING = 0;
+        static readonly OPEN = 1;
+        static readonly CLOSING = 2;
+        static readonly CLOSED = 3;
+
+        readonly CONNECTING = 0;
+        readonly OPEN = 1;
+        readonly CLOSING = 2;
+        readonly CLOSED = 3;
+        readonly readyState = MockWebSocket.CLOSED;
+        readonly url: string;
+        readonly protocol = "";
+        readonly extensions = "";
+        readonly bufferedAmount = 0;
+        readonly binaryType: BinaryType = "blob";
+
+        onopen: ((this: WebSocket, ev: Event) => void) | null = null;
+        onclose: ((this: WebSocket, ev: CloseEvent) => void) | null = null;
+        onmessage: ((this: WebSocket, ev: MessageEvent) => void) | null = null;
+        onerror: ((this: WebSocket, ev: Event) => void) | null = null;
+
+        constructor(url: string) {
+          this.url = url;
+          // Simulate immediate connection failure in next tick
+          setTimeout(() => {
+            if (this.onclose) {
+              this.onclose.call(this, new CloseEvent("close", { code: 1006 }));
+            }
+          }, 0);
+        }
+
+        close(): void {
+          if (this.onclose) {
+            this.onclose.call(this, new CloseEvent("close", { code: 1000 }));
+          }
+        }
+
+        send(): void {
+          // No-op for test mock
+        }
+
+        addEventListener(): void {
+          // No-op for test mock
+        }
+
+        removeEventListener(): void {
+          // No-op for test mock
+        }
+
+        dispatchEvent(): boolean {
+          return false;
+        }
+      }
+
+      // Type-safe window modification
+      (window as unknown as { WebSocket: typeof MockWebSocket }).WebSocket =
+        MockWebSocket;
+    });
+  }
 
   async mockTracksApi(
     options: {

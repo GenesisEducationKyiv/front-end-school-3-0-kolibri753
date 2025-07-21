@@ -31,8 +31,15 @@ export default defineConfig({
         "**/*.d.ts",
         "**/vite-env.d.ts",
 
-        "**/index.ts",
-        "**/index.tsx",
+        "src/components/index.ts",
+        "src/components/*/index.ts",
+        "src/features/index.ts",
+        "src/helpers/index.ts",
+        "src/hooks/index.ts",
+        "src/hooks/*/index.ts",
+        "src/lib/index.ts",
+        "src/schemas/index.ts",
+        "src/stores/index.ts",
 
         "src/types/**/*",
         "src/config/**/*",

@@ -1,5 +1,3 @@
-import React from "react";
-
 interface SelectModeToggleProps {
   selectionMode: boolean;
   onToggleMode(): void;
@@ -8,14 +6,14 @@ interface SelectModeToggleProps {
   bulkDeleteDisabled: boolean;
 }
 
-export const SelectModeToggle: React.FC<SelectModeToggleProps> = ({
+export const SelectModeToggle = ({
   selectionMode,
   onToggleMode,
   selectedCount,
   onBulkDelete,
   bulkDeleteDisabled,
-}) => (
-  <div role="toolbar" className="flex items-center space-x-2 ml-auto">
+}: SelectModeToggleProps) => (
+  <div role="toolbar" className="flex items-center">
     <button
       aria-label={
         selectionMode ? "Exit selection mode" : "Enter multi-select mode"
