@@ -25,6 +25,9 @@ export default defineConfig({
         "src/**/*.msw.int.test.{ts,tsx}",
         "src/**/*.ct.{ts,tsx}",
 
+        "src/**/*.stories.{ts,tsx}",
+        "src/**/*.story.{ts,tsx}",
+
         "**/*.d.ts",
         "**/vite-env.d.ts",
 
