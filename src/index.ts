@@ -63,6 +63,41 @@ async function start() {
       root: config.storage.uploadsDir,
       prefix: "/api/files/",
       decorateReply: false,
+      setHeaders: (res, path, stat) => {
+        // CORS headers for audio files
+        res.setHeader("Access-Control-Allow-Origin", config.cors.origin);
+        res.setHeader("Access-Control-Allow-Methods", "GET, HEAD, OPTIONS");
+        res.setHeader(
+          "Access-Control-Allow-Headers",
+          "Range, Content-Range, Content-Type"
+        );
+        res.setHeader(
+          "Access-Control-Expose-Headers",
+          "Content-Length, Content-Range, Accept-Ranges"
+        );
+
+        // Enable range requests for audio streaming
+        res.setHeader("Accept-Ranges", "bytes");
+
+        // Set proper cache headers for audio files
+        if (path.match(/\.(mp3|wav|ogg|m4a)$/i)) {
+          res.setHeader("Cache-Control", "public, max-age=3600"); // 1 hour cache
+        }
+      },
+    });
+
+    // Handle preflight requests for audio files
+    fastify.options("/api/files/*", async (request, reply) => {
+      return reply
+        .header("Access-Control-Allow-Origin", config.cors.origin)
+        .header("Access-Control-Allow-Methods", "GET, HEAD, OPTIONS")
+        .header(
+          "Access-Control-Allow-Headers",
+          "Range, Content-Range, Content-Type"
+        )
+        .header("Access-Control-Max-Age", "86400")
+        .code(200)
+        .send();
     });
 
     // Register Swagger
