@@ -1,5 +1,6 @@
 import { type ColumnDef } from "@tanstack/react-table";
 import { Edit2, Trash2 } from "lucide-react";
+import { env } from "@/config";
 import type { Track } from "@/types";
 import { TrackPlayer, OptimizedImage } from "@/components";
 
@@ -132,7 +133,7 @@ export const columns: ColumnDef<Track, unknown>[] = [
             id: track.id,
             title: track.title,
             artist: track.artist,
-            src: `/api/files/${track.audioFile}`,
+            src: `${env.API_PREFIX}/files/${track.audioFile}`,
             cover: track.coverImage,
           }}
           onRemove={() => onDeleteFile(track)}
