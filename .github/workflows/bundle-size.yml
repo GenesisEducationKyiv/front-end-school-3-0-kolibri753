@@ -1,0 +1,46 @@
+name: Bundle size analysis
+
+on:
+  workflow_dispatch:
+
+env:
+  NODE_VERSION: 20
+
+defaults:
+  run:
+    working-directory: client
+
+jobs:
+  analyze:
+    name: Build & visualise bundle
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+
+      - name: Restore node_modules cache
+        id: modules-cache
+        uses: actions/cache@v4
+        with:
+          path: client/node_modules
+          key: modules-${{ runner.os }}-${{ hashFiles('client/package-lock.json') }}
+          restore-keys: modules-${{ runner.os }}-
+
+      - name: Install packages
+        if: steps.modules-cache.outputs.cache-hit != 'true'
+        run: npm ci --prefer-offline --no-audit --no-fund
+
+      - name: Build & analyze bundle
+        run: npm run build:analyze
+
+      - name: Upload bundle-analysis reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: bundle-analysis
+          path: client/dist/bundle-analysis-*.html
+          retention-days: 7
